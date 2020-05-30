@@ -16,7 +16,8 @@ public class QuestionDataSource {
     private List<Question> quizQuestions;
 
     public static final String DATABASE ="quizQuestions.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:/home/etg/Desktop/JavaQuizProject/" + DATABASE;
+    private static final String CURRENT_DIRECTORY = System.getProperty("user.dir");
+    public static final String CONNECTION_STRING = "jdbc:sqlite:" + CURRENT_DIRECTORY +"/" + DATABASE;
 
     public static final String TABLE_QUIZ = "quizzes";
     public static final String COLUMN_QUIZ_ID = "_id";
@@ -46,6 +47,8 @@ public class QuestionDataSource {
 
     public boolean open(){
         try{
+            System.out.println(CURRENT_DIRECTORY);
+            System.out.println(CONNECTION_STRING);
             conn = DriverManager.getConnection(CONNECTION_STRING);
             return true;
         } catch (SQLException e){
