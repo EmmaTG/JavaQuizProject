@@ -19,9 +19,14 @@ public class QuestionDataSource {
     private static final String CURRENT_DIRECTORY = System.getProperty("user.dir");
     public static final String CONNECTION_STRING = "jdbc:sqlite:" + CURRENT_DIRECTORY +"/" + DATABASE;
 
+    public static final String TABLE_CATEGORIES = "Categories";
+    public static final String COLUMN_CATEGORIES_ID = "_id";
+    public static final String COLUMN_NAME = "name";
+
     public static final String TABLE_QUIZ = "quizzes";
     public static final String COLUMN_QUIZ_ID = "_id";
     public static final String COLUMN_QUIZ_NAME = "name";
+    public static final String COLUMN_QUIZ_CATEGORIES = "category";
 
     public static final String TABLE_QUESTIONS = "questions";
     public static final String COLUMN_QUESTIONS_ID = "_id";
@@ -47,8 +52,6 @@ public class QuestionDataSource {
 
     public boolean open(){
         try{
-            System.out.println(CURRENT_DIRECTORY);
-            System.out.println(CONNECTION_STRING);
             conn = DriverManager.getConnection(CONNECTION_STRING);
             return true;
         } catch (SQLException e){
@@ -159,8 +162,9 @@ public class QuestionDataSource {
 
     public void saveNewQuiz(Quiz newQuiz){
         String addQuiz = "INSERT INTO " + TABLE_QUIZ +
-                " (" + COLUMN_QUIZ_NAME + ") " +
-                "VALUES(\"" + newQuiz.getName() + "\")";
+                " (" + COLUMN_QUIZ_NAME + "," + COLUMN_QUIZ_CATEGORIES + ") " +
+                "VALUES(\"" + newQuiz.getName() + "\",2)";
+        System.out.println(addQuiz);
         int quizID =-1;
         try (Statement statement = conn.createStatement()){
             statement.execute(addQuiz);
