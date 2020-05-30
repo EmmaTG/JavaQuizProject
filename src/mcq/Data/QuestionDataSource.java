@@ -6,7 +6,6 @@ import mcq.Questions.TrueFalse;
 import mcq.Questions.WriteInQuestion;
 import mcq.Quiz;
 
-import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ public class QuestionDataSource {
     private List<Question> quizQuestions;
 
     public static final String DATABASE ="quizQuestions.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:/home/etg/Desktop/CompleteJavaMasterclass/Quiz/" + DATABASE;
+    public static final String CONNECTION_STRING = "jdbc:sqlite:/home/etg/Desktop/JavaQuizProject/" + DATABASE;
 
     public static final String TABLE_QUIZ = "quizzes";
     public static final String COLUMN_QUIZ_ID = "_id";
