@@ -42,6 +42,31 @@ public class QuestionDataSource {
     public static final int TF = 2;
     public static final int WI = 3;
 
+    private static String queryQuizSQL = "SELECT (" + COLUMN_QUIZ_ID +
+            ") FROM " + TABLE_QUIZ +
+            " WHERE " + COLUMN_QUIZ_NAME +
+            "= ?";
+
+    private static String addQuiz = "INSERT INTO " + TABLE_QUIZ +
+            " (" + COLUMN_QUIZ_NAME + "," + COLUMN_QUIZ_CATEGORIES + ") " +
+            "VALUES(?,2)";
+
+    private static String sqlInsert1 = "INSERT INTO " + TABLE_QUESTIONS +
+            " (" + COLUMN_QUESTIONS_TITLE + "," + COLUMN_QUESTIONS_TYPE + "," + COLUMN_QUESTIONS_ANSWER +
+            "," + COLUMN_QUESTIONS_QUIZ + ") " +
+            " VALUES(?,?,?,?)";
+
+    private static String sqlInsert2 = "INSERT INTO " + TABLE_QUESTIONS +
+            " (" + COLUMN_QUESTIONS_TITLE + "," + COLUMN_QUESTIONS_TYPE + "," + COLUMN_QUESTIONS_ANSWER +
+            "," + COLUMN_QUESTIONS_OPTION1 + "," + COLUMN_QUESTIONS_OPTION2 + "," +
+            COLUMN_QUESTIONS_OPTION3 + "," + COLUMN_QUESTIONS_QUIZ + ") " +
+            " VALUES(?,?,?,?,?,?,?)";
+
+    private static PreparedStatement queryQuizPrep;
+    private static PreparedStatement saveQuizPrep;
+    private static PreparedStatement saveQuestionInsertPrep1;
+    private static PreparedStatement saveQuestionInsertPrep2;
+
 
     public static QuestionDataSource getInstance() {
         return ourInstance;
@@ -53,6 +78,10 @@ public class QuestionDataSource {
     public boolean open(){
         try{
             conn = DriverManager.getConnection(CONNECTION_STRING);
+            queryQuizPrep = conn.prepareStatement(queryQuizSQL);
+            saveQuizPrep = conn.prepareStatement(addQuiz);
+            saveQuestionInsertPrep1 = conn.prepareStatement(sqlInsert1);
+            saveQuestionInsertPrep2 = conn.prepareStatement(sqlInsert2);
             return true;
         } catch (SQLException e){
             System.out.println("Error opening SQL connection: " + e.getMessage());
@@ -65,6 +94,22 @@ public class QuestionDataSource {
             if (conn != null){
                 conn.close();
                 return true;
+            }
+
+            if (queryQuizPrep != null){
+                queryQuizPrep.close();
+            }
+
+            if (saveQuizPrep != null){
+                saveQuizPrep.close();
+            }
+
+            if (saveQuestionInsertPrep1 != null){
+                saveQuestionInsertPrep1.close();
+            }
+
+            if (saveQuestionInsertPrep2 != null){
+                saveQuestionInsertPrep2.close();
             }
             return false;
         } catch (SQLException e){
@@ -80,7 +125,6 @@ public class QuestionDataSource {
             System.out.println("Error getting quiz _id");
             return;
         }
-
         String sql = "SELECT * FROM " + TABLE_QUESTIONS +
                 " WHERE " + COLUMN_QUESTIONS_QUIZ +
                 "=" + quizID;
@@ -130,18 +174,14 @@ public class QuestionDataSource {
     }
 
     private int queryQuizID(String quizName){
-        String sql = "SELECT (" + COLUMN_QUIZ_ID +
-                ") FROM " + TABLE_QUIZ +
-                " WHERE " + COLUMN_QUIZ_NAME +
-                "=\"" + quizName + "\"";
-        try(Statement statement = conn.createStatement();
-            ResultSet results = statement.executeQuery(sql)){
+        try {
+            queryQuizPrep.setString(1,quizName);
+            ResultSet results = queryQuizPrep.executeQuery();
             return results.getInt(1);
         } catch (SQLException e){
             System.out.println("Error getting quiz _id: " + e.getMessage());
             return -1;
         }
-
     }
 
     public List<String> getQuizzes(){
@@ -161,24 +201,19 @@ public class QuestionDataSource {
     }
 
     public void saveNewQuiz(Quiz newQuiz){
-        String addQuiz = "INSERT INTO " + TABLE_QUIZ +
-                " (" + COLUMN_QUIZ_NAME + "," + COLUMN_QUIZ_CATEGORIES + ") " +
-                "VALUES(\"" + newQuiz.getName() + "\",2)";
-        System.out.println(addQuiz);
         int quizID =-1;
-        try (Statement statement = conn.createStatement()){
-            statement.execute(addQuiz);
+        try {
+            saveQuizPrep.setString(1,newQuiz.getName());
+            saveQuizPrep.execute();
             quizID = queryQuizID(newQuiz.getName());
         } catch (SQLException e){
             System.out.println("SQL Error creating quiz: " + newQuiz.getName() );
             System.out.println(e.getMessage());
         }
 
-
         for (Question question : newQuiz.getQuestions()){
             String title = question.getQuestion();
             String answer = question.getCorrectAnswer();
-            String sqlInsert;
             if (question instanceof TrueFalse || question instanceof WriteInQuestion){
                 int type;
                 if (question instanceof WriteInQuestion){
@@ -186,32 +221,38 @@ public class QuestionDataSource {
                 } else{
                     type = TF;
                 }
-                sqlInsert = "INSERT INTO " + TABLE_QUESTIONS +
-                        " (" + COLUMN_QUESTIONS_TITLE + "," + COLUMN_QUESTIONS_TYPE + "," + COLUMN_QUESTIONS_ANSWER +
-                        "," + COLUMN_QUESTIONS_QUIZ + ") " +
-                        " VALUES(\"" + title + "\"," + type + ",\"" +
-                        answer + "\"," + quizID + ")";
+                try {
+                    saveQuestionInsertPrep1.setString(1, title);
+                    saveQuestionInsertPrep1.setInt(2, type);
+                    saveQuestionInsertPrep1.setString(3, answer);
+                    saveQuestionInsertPrep1.setInt(4, quizID);
+                    saveQuestionInsertPrep1.execute();
+                } catch (SQLException e){
+                    System.out.println("SQL Error adding question titled: " + question.getQuestion());
+                    System.out.println(e.getMessage());
+                }
             }
             else if (question instanceof MultipleChoiceQuestion){
                 List<String> options = question.getOptions();
-                sqlInsert = "INSERT INTO " + TABLE_QUESTIONS +
-                        " (" + COLUMN_QUESTIONS_TITLE + "," + COLUMN_QUESTIONS_TYPE + "," + COLUMN_QUESTIONS_ANSWER +
-                        "," + COLUMN_QUESTIONS_OPTION1 + "," + COLUMN_QUESTIONS_OPTION2 + "," +
-                        COLUMN_QUESTIONS_OPTION3 + "," + COLUMN_QUESTIONS_QUIZ + ") " +
-                        " VALUES(\"" + title + "\"," + MCQ + ",\"" + answer + "\",\"" +
-                        options.get(1) + "\",\"" + options.get(1) + "\",\"" +
-                        options.get(3) + "\"," + quizID + ")";
+                try {
+                    saveQuestionInsertPrep2.setString(1,title);
+                    saveQuestionInsertPrep2.setInt(2,MCQ);
+                    saveQuestionInsertPrep2.setString(3,answer);
+                    saveQuestionInsertPrep2.setString(4,options.get(1));
+                    saveQuestionInsertPrep2.setString(5,options.get(2));
+                    saveQuestionInsertPrep2.setString(6,options.get(3));
+                    saveQuestionInsertPrep2.setInt(7,quizID);
+                    saveQuestionInsertPrep2.execute();
+                } catch (SQLException e){
+                    System.out.println("SQL Error adding question titled: " + question.getQuestion());
+                    System.out.println(e.getMessage());
+                }
+
             } else {
                 System.out.println("Error unknown type of question");
                 return;
             }
 
-            try(Statement statement = conn.createStatement()){
-                    statement.execute(sqlInsert);
-            } catch (SQLException e){
-                System.out.println("SQL Error adding question titled: " + question.getQuestion());
-                System.out.println(e.getMessage());
-            }
         }
     }
 }
