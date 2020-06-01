@@ -2,19 +2,14 @@ package mcq;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import mcq.Data.QuestionDataSource;
 import mcq.QuestionScenes.QuestionScene;
 import mcq.Questions.MultipleChoiceQuestion;
@@ -22,7 +17,6 @@ import mcq.Questions.Question;
 import mcq.Questions.TrueFalse;
 import mcq.Questions.WriteInQuestion;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,6 +69,7 @@ public class CreateQuizQuestionsStage {
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getTrueToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("true"));
                 dialogObject.getFalseToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("false"));
+//                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
                 Optional<TrueFalse> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     TrueFalse tf = result.get();
@@ -85,6 +80,7 @@ public class CreateQuizQuestionsStage {
                 NewWriteInDialog dialogObject = new NewWriteInDialog();
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
+//                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
                 Optional<WriteInQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     WriteInQuestion wi = result.get();
@@ -98,6 +94,7 @@ public class CreateQuizQuestionsStage {
                 dialogObject.getFalseAnswerTextField1().setText(selectQuestion.getOptions().get(0));
                 dialogObject.getFalseAnswerTextField2().setText(selectQuestion.getOptions().get(1));
                 dialogObject.getFalseAnswerTextField3().setText(selectQuestion.getOptions().get(2));
+//                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
                 Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     MultipleChoiceQuestion mcq = result.get();

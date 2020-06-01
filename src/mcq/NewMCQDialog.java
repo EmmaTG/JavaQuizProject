@@ -1,6 +1,5 @@
 package mcq;
 
-import javafx.collections.ListChangeListener;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
@@ -47,6 +46,10 @@ public class NewMCQDialog {
         return falseAnswerTextField3;
     }
 
+    public ButtonType getOkButton() {
+        return okButton;
+    }
+
     private  void createDialogBox() {
         GridPane gridPane = new GridPane();
 
@@ -76,7 +79,14 @@ public class NewMCQDialog {
         falseAnswerTextField1.setOnKeyReleased(e -> okayButtonRelease());
         falseAnswerTextField2.setOnKeyReleased(e -> okayButtonRelease());
         falseAnswerTextField3.setOnKeyReleased(e -> okayButtonRelease());
-        dialog.getDialogPane().lookupButton(okButton).setDisable(true);
+
+        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty() ||
+                falseAnswerTextField1.getText().isEmpty() || falseAnswerTextField1.getText().trim().isEmpty() ||
+                falseAnswerTextField2.getText().isEmpty() || falseAnswerTextField2.getText().trim().isEmpty() ||
+                falseAnswerTextField3.getText().isEmpty() || falseAnswerTextField3.getText().trim().isEmpty();
+
+        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
 
         dialog.setResultConverter(new Callback<ButtonType, MultipleChoiceQuestion>() {
             @Override

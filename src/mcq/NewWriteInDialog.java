@@ -15,6 +15,7 @@ public class NewWriteInDialog {
     private  ButtonType okButton = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
     private  ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
+
     public NewWriteInDialog() {
         this.dialog = new Dialog<>();
     }
@@ -25,6 +26,10 @@ public class NewWriteInDialog {
 
     public TextField getAnswerTextField() {
         return answerTextField;
+    }
+
+    public ButtonType getOkButton() {
+        return okButton;
     }
 
     private  void createDialogBox() {
@@ -49,7 +54,8 @@ public class NewWriteInDialog {
         dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
 
 
-        dialog.getDialogPane().lookupButton(okButton).setDisable(true);
+        dialog.getDialogPane().lookupButton(okButton).setDisable(questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty());
         questionTextField.setOnKeyReleased(e -> okayButtonRelease());
         answerTextField.setOnKeyReleased(e -> okayButtonRelease());
         dialog.setResultConverter(new Callback<ButtonType, WriteInQuestion>() {

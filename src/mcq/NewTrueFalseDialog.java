@@ -34,6 +34,10 @@ public class NewTrueFalseDialog{
         return falseToggle;
     }
 
+    public ButtonType getOkButton() {
+        return okButton;
+    }
+
     private  void createDialogBox() {
         GridPane gridPane = new GridPane();
 
@@ -58,7 +62,8 @@ public class NewTrueFalseDialog{
         questionTextField.setOnKeyReleased(e-> okayButtonRelease());
         trueToggle.setOnAction(e -> okayButtonRelease());
         falseToggle.setOnAction(e -> okayButtonRelease());
-        dialog.getDialogPane().lookupButton(okButton).setDisable(true);
+        dialog.getDialogPane().lookupButton(okButton).setDisable(questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                (!trueToggle.isSelected() && !falseToggle.isSelected()));
 
         ToggleGroup tg = new ToggleGroup();
         tg.getToggles().setAll(trueToggle,falseToggle);
