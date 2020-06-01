@@ -34,6 +34,12 @@ public class Main extends Application {
     public static boolean homeScreen;
     public static Stage typeOfQStage = new Stage();
 
+    enum questionType {
+        MCQ,
+        TF,
+        WI
+    }
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -107,42 +113,24 @@ public class Main extends Application {
         return questionScenesObservList;
     }
 
-    private static boolean createMCQQuestion(Quiz newQuiz) {
-        NewMCQDialog dialogObject1 = new NewMCQDialog();
-        Dialog<MultipleChoiceQuestion> dialog1 = dialogObject1.getDialog();
-        Optional<MultipleChoiceQuestion> result1 = dialog1.showAndWait();
-
-        if (result1.isPresent()) {
-            MultipleChoiceQuestion mcq = result1.get();
-            newQuiz.addQuestion(mcq);
-            return true;
+    private static boolean createQuestion(Quiz newQuiz, questionType type){
+        Dialog<? extends Question> dialog = null;
+        if (type == questionType.MCQ){
+            dialog = new NewMCQDialog().getDialog();
+        } else if ( type == questionType.TF){
+            dialog = new NewTrueFalseDialog().getDialog();
+        } else if (type == questionType.WI){
+            dialog= new NewWriteInDialog().getDialog();
         }
-        return false;
-    }
-
-    private static boolean createTFQuestion(Quiz newQuiz) {
-        NewTrueFalseDialog dialogObject2 = new NewTrueFalseDialog();
-        Dialog<TrueFalse> dialog2 = dialogObject2.getDialog();
-        Optional<TrueFalse> result2 = dialog2.showAndWait();
-        if (result2.isPresent()) {
-            TrueFalse tf = result2.get();
-            newQuiz.addQuestion(tf);
-            return true;
+        if (dialog != null) {;
+            Optional<? extends Question> result1 = dialog.showAndWait();
+            if (result1.isPresent()) {
+                Question question = result1.get();
+                newQuiz.addQuestion(question);
+                return true;
+            }
         }
-        return false;
-    }
-
-    private static boolean createWIQuestion(Quiz newQuiz) {
-        NewWriteInDialog dialogObject3 = new NewWriteInDialog();
-        Dialog<WriteInQuestion> dialog3 = dialogObject3.getDialog();
-        Optional<WriteInQuestion> result3 = dialog3.showAndWait();
-
-        if (result3.isPresent()) {
-            WriteInQuestion wiq = result3.get();
-            newQuiz.addQuestion(wiq);
-            return true;
-        }
-        return false;
+        return true;
     }
 
     private static void selectQuiz() {
@@ -197,19 +185,19 @@ public class Main extends Application {
         gridPane.setStyle("-fx-padding: 50");
 
         mcqButton.setOnAction(e -> {
-            if (createMCQQuestion(newQuiz)) {
+            if (createQuestion(newQuiz, questionType.MCQ)) {
                 property.set(property.get() + 1);
             }
             return;
         });
         tfButton.setOnAction(e -> {
-            if (createTFQuestion(newQuiz)) {
+            if (createQuestion(newQuiz, questionType.TF)) {
                 property.set(property.get() + 1);
             }
             return;
         });
         wiButton.setOnAction(e -> {
-            if (createWIQuestion(newQuiz)) {
+            if (createQuestion(newQuiz,questionType.WI)) {
                 property.set(property.get() + 1);
             }
             return;
