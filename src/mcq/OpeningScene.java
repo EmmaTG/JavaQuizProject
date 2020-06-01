@@ -10,7 +10,7 @@ public class OpeningScene {
 
     private Scene scene;
     private final Button createQuiz = new Button("Create a quiz");
-    private final Button existingQuiz = new Button("Use exiting Quiz");
+    private final Button existingQuiz = new Button("Use existing Quiz");
     private final Button quitQuiz = new Button("Quit");
 
     private Label welcomeLabel = new Label();

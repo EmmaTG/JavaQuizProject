@@ -118,9 +118,7 @@ public class CreateQuizQuestionsStage {
         Runnable saveRunnable = new Runnable() {
             @Override
             public void run() {
-                QuestionDataSource.getInstance().open();
                 QuestionDataSource.getInstance().saveNewQuiz(createdQuiz);
-                QuestionDataSource.getInstance().close();
             }
         };
 

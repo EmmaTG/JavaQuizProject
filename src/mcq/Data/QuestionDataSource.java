@@ -14,6 +14,7 @@ public class QuestionDataSource {
     private static QuestionDataSource ourInstance = new QuestionDataSource();
     private Connection conn;
     private List<Question> quizQuestions;
+    private List<String> quizzesInDatabase;
 
     public static final String DATABASE ="quizQuestions.db";
     private static final String CURRENT_DIRECTORY = System.getProperty("user.dir");
@@ -21,7 +22,7 @@ public class QuestionDataSource {
 
     public static final String TABLE_CATEGORIES = "Categories";
     public static final String COLUMN_CATEGORIES_ID = "_id";
-    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_CATEGORIES_NAME = "name";
 
     public static final String TABLE_QUIZ = "quizzes";
     public static final String COLUMN_QUIZ_ID = "_id";
@@ -118,6 +119,7 @@ public class QuestionDataSource {
         }
     }
 
+
     public void queryQuizQuestion(String quizName){
         quizQuestions = new ArrayList<>();
         int quizID = queryQuizID(quizName);
@@ -184,20 +186,43 @@ public class QuestionDataSource {
         }
     }
 
-    public List<String> getQuizzes(){
-        List<String> quizzesInDatabase = new ArrayList<>();
+    public void selectedQuizzes(String category){
+        int categoryID = getCategoryID(category);
+        if (categoryID==-1) {
+            System.out.println("Fatal Error!");
+            return;
+        }
+        quizzesInDatabase = new ArrayList<>();
         String sql = "SELECT " + TABLE_QUIZ + "." + COLUMN_QUIZ_NAME +
-                " FROM " + TABLE_QUIZ;
+                " FROM " + TABLE_QUIZ + " WHERE " + COLUMN_QUIZ_CATEGORIES +
+                "=" + categoryID;
         try(Statement statement = conn.createStatement();
             ResultSet results = statement.executeQuery(sql)){
             while (results.next()) {
                 quizzesInDatabase.add(results.getString(1));
             }
-            return quizzesInDatabase;
+            return;
         } catch (SQLException e){
-            System.out.println("Error getting quizzes in database: " + e.getMessage());
-            return null;
+            System.out.println("Error getting quizzes in selected category: " + e.getMessage());
+            return;
         }
+    }
+
+    private int getCategoryID(String categoryName){
+        String sql = "SELECT " + TABLE_CATEGORIES + "." + COLUMN_CATEGORIES_ID +
+                " FROM " + TABLE_CATEGORIES + " WHERE " + COLUMN_CATEGORIES_NAME +
+                "=\"" + categoryName + "\"";
+        try(Statement statement = conn.createStatement();
+        ResultSet result = statement.executeQuery(sql)){
+            return result.getInt(1);
+        } catch (SQLException e){
+            System.out.println("Cannot find Category ID for " + categoryName + " : " + e.getMessage());
+            return -1;
+        }
+    }
+
+    public List<String> getQuizzesInDatabase() {
+        return quizzesInDatabase;
     }
 
     public void saveNewQuiz(Quiz newQuiz){
@@ -253,6 +278,23 @@ public class QuestionDataSource {
                 return;
             }
 
+        }
+    }
+
+    public List<String> getCategories(){
+        String getCategories = "SELECT (" + TABLE_CATEGORIES + "." + COLUMN_CATEGORIES_NAME +
+                ") FROM " + TABLE_CATEGORIES;
+        try (Statement statement = conn.createStatement();
+        ResultSet results = statement.executeQuery(getCategories)){
+            List<String> categories = new ArrayList<>();
+            while (results.next()){
+                categories.add(results.getString(1));
+            }
+            return categories;
+
+        } catch (SQLException e){
+            System.out.println("Error getting categories: " + e.getMessage());
+            return null;
         }
     }
 }

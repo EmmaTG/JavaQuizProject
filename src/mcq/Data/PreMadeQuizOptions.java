@@ -1,8 +1,5 @@
 package mcq.Data;
 
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
@@ -20,7 +17,7 @@ public class PreMadeQuizOptions {
     private static Scene newScene;
 
     public static Stage getNewStage() {
-        List<String> quizList = QuestionDataSource.getInstance().getQuizzes();
+        List<String> quizList = QuestionDataSource.getInstance().getQuizzesInDatabase();
         List<Button> quizListButtons = new ArrayList<>();
         for (String quizTitle : quizList) {
             Button newButton = new Button(quizTitle);

@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mcq.Data.PreMadeQuizOptions;
 import mcq.Data.QuestionDataSource;
+import mcq.Data.SelectCategoryStage;
 import mcq.QuestionScenes.QuestionScene;
 import mcq.QuestionScenes.WriteInQuestionScene;
 import mcq.Questions.*;
@@ -43,8 +44,23 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
         homeScreen("Welcome!");
 
+    }
+
+    @Override
+    public void init() throws Exception {
+
+        if (!QuestionDataSource.getInstance().open()) {
+            System.out.println("Fatal Error! Cannot open Data base");
+            Platform.exit();
+        }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        QuestionDataSource.getInstance().close();
     }
 
     public static void homeScreen(String message) {
@@ -133,17 +149,19 @@ public class Main extends Application {
         return true;
     }
 
+    private static void selectCategory(){
+
+    }
+
     private static void selectQuiz() {
 
-        if (!QuestionDataSource.getInstance().open()) {
-            System.out.println("Fatal Error! Cannot open Data base");
-            Platform.exit();
-        }
+        Stage selectCategoryStage = SelectCategoryStage.getCategoryStage();
+        selectCategoryStage.showAndWait();
+
         Stage selectQuizStage = PreMadeQuizOptions.getNewStage();
         selectQuizStage.showAndWait();
 
         List<Question> selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
-        QuestionDataSource.getInstance().close();
 
         if (selectedQuizQuestions != null){
         ObservableList<QuestionScene> questionScenes = createQuestionScenes(selectedQuizQuestions);
