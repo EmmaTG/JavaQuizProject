@@ -12,11 +12,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mcq.Questions.MultipleChoiceQuestion;
 import mcq.Questions.Question;
-import mcq.Questions.TrueFalse;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static javafx.scene.text.TextAlignment.CENTER;
 
 public class QuestionScene<T extends Question> {
 
@@ -54,6 +55,8 @@ public class QuestionScene<T extends Question> {
         List<HBox> hboxes = new ArrayList<>();
         for (int i=0;i<buttonActions.size();i+=2){
             HBox answerOptions = new HBox();
+            buttonActions.get(i).getStyleClass().add("answerButton"+i);
+            buttonActions.get(i+1).getStyleClass().add("answerButton"+(i+1));
             try {
                 answerOptions = new HBox(buttonActions.get(i),buttonActions.get(i+1));
             } catch (IndexOutOfBoundsException e){
@@ -82,6 +85,7 @@ public class QuestionScene<T extends Question> {
         newStage = new Stage();
         newScene = new Scene(questionWindow);
         newStage.setScene(newScene);
+        newScene.getStylesheets().add(QuestionScene.class.getResource("QuestionScene.css").toExternalForm());
         return newStage;
     }
 
@@ -95,12 +99,14 @@ public class QuestionScene<T extends Question> {
 
     public void setPossibleAnswers() {
         questionNumber++;
-        if (this.question instanceof MultipleChoiceQuestion || this.question instanceof TrueFalse) {
+        if (this.question instanceof MultipleChoiceQuestion) {
             for (String buttonText : question.getOptions()) {
                 Button newButton = new Button(buttonText);
-                newButton.setPrefWidth(sceneWidth / (question.getOptions().size()/2));
+                newButton.setPrefWidth(((float) sceneWidth) / 2.0);
                 newButton.setPrefHeight(100);
                 newButton.setWrapText(true);
+                newButton.setAlignment(Pos.CENTER);
+                newButton.setTextAlignment(CENTER);
                 possibleAnswers.add(newButton);
             }
             Collections.shuffle(possibleAnswers);
@@ -109,10 +115,14 @@ public class QuestionScene<T extends Question> {
 
     public <T extends Question> VBox questionHeading(T question, int questionNumber){
         Label heading = new Label("Question " + questionNumber);
+        heading.getStyleClass().add("questionNumber");
         heading.setPrefHeight(50);
         heading.setPrefWidth(sceneWidth);
         heading.setWrapText(true);
         Label questionToAnswer = new Label(question.getQuestion());
+        questionToAnswer.getStyleClass().add("questionLabel");
+        questionToAnswer.setAlignment(Pos.CENTER);
+        questionToAnswer.setTextAlignment( CENTER );
         questionToAnswer.setPrefHeight(150);
         questionToAnswer.setPrefWidth(sceneWidth);
         questionToAnswer.setWrapText(true);

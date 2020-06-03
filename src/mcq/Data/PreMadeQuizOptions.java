@@ -1,11 +1,14 @@
 package mcq.Data;
 
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import mcq.Main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,8 @@ public class PreMadeQuizOptions {
         for (String quizTitle : quizList) {
             Button newButton = new Button(quizTitle);
             newButton.setMaxWidth(Double.MAX_VALUE);
+            newButton.setTextAlignment(TextAlignment.CENTER);
+            newButton.setAlignment(Pos.CENTER);
             newButton.setOnAction(e -> {
                 QuestionDataSource.getInstance().queryQuizQuestion(quizTitle);
                 newStage.close();
@@ -53,6 +58,12 @@ public class PreMadeQuizOptions {
         gridPane.setVgap(20);
         gridPane.setHgap(20);
         gridPane.setStyle("-fx-padding: 50");
+
+        newStage.setOnCloseRequest(e ->{
+            newStage.close();
+            Main.homeScreen("");
+        });
+
         newScene = new Scene(gridPane);
         newStage.setTitle("Select quiz");
         newStage.setScene(newScene);
