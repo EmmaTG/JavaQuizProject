@@ -73,8 +73,11 @@ public class CreateQuizQuestionsStage {
                 Optional<TrueFalse> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     TrueFalse tf = result.get();
-                    observableQuestionList.set(selectedQuestionInt, tf);
-                    createdQuiz.updateQuestion(selectedQuestionInt, tf);
+                    if (tf!=null) {
+                        observableQuestionList.set(selectedQuestionInt, tf);
+                        createdQuiz.updateQuestion(selectedQuestionInt, tf);
+                    }
+
                 }
             } else if (selectQuestion instanceof WriteInQuestion){
                 NewWriteInDialog dialogObject = new NewWriteInDialog();
@@ -84,8 +87,10 @@ public class CreateQuizQuestionsStage {
                 Optional<WriteInQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     WriteInQuestion wi = result.get();
-                    observableQuestionList.set(selectedQuestionInt, wi);
-                    createdQuiz.updateQuestion(selectedQuestionInt, wi);
+                    if (wi != null) {
+                        observableQuestionList.set(selectedQuestionInt, wi);
+                        createdQuiz.updateQuestion(selectedQuestionInt, wi);
+                    }
                 }
             } else if (selectQuestion instanceof MultipleChoiceQuestion){
                 NewMCQDialog dialogObject = new NewMCQDialog();
@@ -98,8 +103,10 @@ public class CreateQuizQuestionsStage {
                 Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     MultipleChoiceQuestion mcq = result.get();
-                    observableQuestionList.set(selectedQuestionInt, mcq);
-                    createdQuiz.updateQuestion(selectedQuestionInt, mcq);
+                    if (mcq != null) {
+                        observableQuestionList.set(selectedQuestionInt, mcq);
+                        createdQuiz.updateQuestion(selectedQuestionInt, mcq);
+                    }
                 }
             } else {
                 System.out.println("No question selected");

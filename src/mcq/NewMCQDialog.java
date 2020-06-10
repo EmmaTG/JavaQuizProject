@@ -2,6 +2,7 @@ package mcq;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import mcq.Questions.MultipleChoiceQuestion;
 
@@ -21,6 +22,8 @@ public class NewMCQDialog {
     private  TextField falseAnswerTextField3 = new TextField();
     private  ButtonType okButton = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
     private  ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+    private Label includeImage = new Label("Image");
+    private CheckBox imagecheck = new CheckBox();
 
     public NewMCQDialog() {
         this.dialog = new Dialog<>();
@@ -64,10 +67,26 @@ public class NewMCQDialog {
         gridPane.add(falseAnswerTextField1, 0, 5);
         gridPane.add(falseAnswerTextField2, 0, 6);
         gridPane.add(falseAnswerTextField3, 0, 7);
+        gridPane.add(new Label(" "),0,8);
+        HBox imageHbox = new HBox(includeImage,imagecheck);
+        imageHbox.setSpacing(20);
+        imagecheck.setOnAction( e ->{
+            TextField filePath = new TextField();
+            if (imagecheck.isSelected()){
+            gridPane.add(filePath, 0, 10);
+            dialog.setHeight(dialog.getHeight()+30);
+        }
+            else {
+            gridPane.getChildren().remove(gridPane.getChildren().size()-1);
+            dialog.setHeight(dialog.getHeight() - 30);
+        }
+        });
+        gridPane.add(imageHbox,0,9);
         gridPane.setStyle("-fx-padding: 10");
         onActionDialogBox(gridPane);
 
     }
+
 
     private  void onActionDialogBox(GridPane gridPane) {
 

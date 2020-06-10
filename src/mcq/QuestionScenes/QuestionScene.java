@@ -130,4 +130,9 @@ public class QuestionScene<T extends Question> {
         VBox optionsVBox = new VBox(heading,questionToAnswer);
         return optionsVBox;
     }
+
+//    public void addImage(){
+//        // Create an image
+//        Image image = new Image(new FileStream)
+//    }
 }

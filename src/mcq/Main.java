@@ -11,6 +11,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -20,9 +22,16 @@ import mcq.Data.QuestionDataSource;
 import mcq.Data.SelectCategoryStage;
 import mcq.QuestionScenes.QuestionScene;
 import mcq.QuestionScenes.WriteInQuestionScene;
-import mcq.Questions.*;
+import mcq.Questions.MultipleChoiceQuestion;
+import mcq.Questions.Question;
+import mcq.Questions.TrueFalse;
+import mcq.Questions.WriteInQuestion;
 
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class Main extends Application {
 //public class Main {
@@ -44,8 +53,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-        homeScreen("Welcome!");
+        NewWriteInDialog dialogObject = new NewWriteInDialog();
+        dialogObject.getDialog().show();
+//        homeScreen("Welcome!");
 
     }
 
@@ -146,7 +156,7 @@ public class Main extends Application {
                 return true;
             }
         }
-        return true;
+        return false;
     }
 
     private static void selectCategory(){
@@ -283,10 +293,36 @@ public class Main extends Application {
 
                 });
 
+                // Correct answer dialog
                 Alert correctAlert = new Alert(Alert.AlertType.INFORMATION);
                 correctAlert.setHeaderText("Correct!");
+                correctAlert.setTitle("Well done!");
+                try{
+                    ImageView imageView = getimageNode("/home/etg/Desktop/JavaQuizProject/src/mcq/correctImage.png");
+                    imageView.setFitHeight(50);
+                    imageView.setFitWidth(50);
+                    correctAlert.setGraphic(imageView);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Correct image file not found: " + e.getMessage());
+                }
+
+                correctAlert.getDialogPane().getStylesheets().add(Main.class.getResource("AlertsCSS.css").toExternalForm());
+                correctAlert.getDialogPane().getStyleClass().add("correctDialog");
+
                 Alert inCorrectAlert = new Alert(Alert.AlertType.INFORMATION);
                 inCorrectAlert.setHeaderText("Incorrect!");
+                inCorrectAlert.setTitle("Whoops!");
+                try{
+                    ImageView imageView = getimageNode("/home/etg/Desktop/JavaQuizProject/src/mcq/incorrectImage.png");
+                    imageView.setFitHeight(50);
+                    imageView.setFitWidth(50);
+                    inCorrectAlert.setGraphic(imageView);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Correct image file not found: " + e.getMessage());
+                }
+
+                inCorrectAlert.getDialogPane().getStylesheets().add(Main.class.getResource("AlertsCSS.css").toExternalForm());
+                inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
 
                 FXCollections.shuffle(questionButtons);
                 if (qs.getQuestion() instanceof MultipleChoiceQuestion || qs.getQuestion() instanceof TrueFalse) {
@@ -370,6 +406,13 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private static ImageView getimageNode(String filePath) throws FileNotFoundException{
+        Image image = new Image(new FileInputStream(filePath));
+        // Setting new image
+        return new ImageView(image);
+
     }
 
 }
