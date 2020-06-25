@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class NewMCQDialog {
+public class MCQDialog {
 
     private  Dialog<MultipleChoiceQuestion> dialog;
     private  Label label1 = new Label("Question: ");
@@ -29,7 +29,7 @@ public class NewMCQDialog {
     private CheckBox imagecheck = new CheckBox();
     private TextField filePath = new TextField();
 
-    public NewMCQDialog() {
+    public MCQDialog() {
         this.dialog = new Dialog<>();
     }
 

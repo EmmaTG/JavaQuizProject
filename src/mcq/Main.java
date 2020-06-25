@@ -55,14 +55,27 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Quiz testQuiz = new Quiz("Test");
         List<Question> questionList = new ArrayList<>();
-        NewMCQDialog dialogObject = new NewMCQDialog();
+        MCQDialog dialogObject = new MCQDialog();
        Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
        if (result.isPresent()){
            MultipleChoiceQuestion mcq = result.get();
             questionList.add(mcq);
-            runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
-
        }
+       WriteInDialog dialogObject2 = new WriteInDialog();
+        Optional<WriteInQuestion> result2 = dialogObject2.getDialog().showAndWait();
+        if (result2.isPresent()){
+            WriteInQuestion q = result2.get();
+            questionList.add(q);
+        }
+
+        TrueFalseDialog dialog3 = new TrueFalseDialog();
+        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
+        if (tfResult.isPresent()){
+            TrueFalse tf = tfResult.get();
+            questionList.add(tf);
+        }
+
+        runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
 
 //        homeScreen("Welcome!");
 
@@ -151,11 +164,11 @@ public class Main extends Application {
     private static boolean createQuestion(Quiz newQuiz, questionType type){
         Dialog<? extends Question> dialog = null;
         if (type == questionType.MCQ){
-            dialog = new NewMCQDialog().getDialog();
+            dialog = new MCQDialog().getDialog();
         } else if ( type == questionType.TF){
-            dialog = new NewTrueFalseDialog().getDialog();
+            dialog = new TrueFalseDialog().getDialog();
         } else if (type == questionType.WI){
-            dialog= new NewWriteInDialog().getDialog();
+            dialog= new WriteInDialog().getDialog();
         }
         if (dialog != null) {;
             Optional<? extends Question> result1 = dialog.showAndWait();

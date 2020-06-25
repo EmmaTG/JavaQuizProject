@@ -1,12 +1,16 @@
 package mcq;
 
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import mcq.Questions.TrueFalse;
 
-public class NewTrueFalseDialog{
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class TrueFalseDialog {
 
     private  Dialog<TrueFalse> dialog;
     private  Label label1 = new Label("Question: ");
@@ -19,9 +23,10 @@ public class NewTrueFalseDialog{
     private  ButtonType okButton = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
     private  ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
     private Label includeImage = new Label("Image");
-    private CheckBox imagecheck = new CheckBox();
+    private CheckBox imageCheck = new CheckBox();
+    private TextField filePath = new TextField();
 
-    public NewTrueFalseDialog() {
+    public TrueFalseDialog() {
         this.dialog = new Dialog<>();
     }
 
@@ -54,11 +59,10 @@ public class NewTrueFalseDialog{
         gridPane.add(trueToggle, 0, 3);
         gridPane.add(falseToggle, 1, 3);
         gridPane.add(new Label(" "),0,8);
-        HBox imageHbox = new HBox(includeImage,imagecheck);
+        HBox imageHbox = new HBox(includeImage, imageCheck);
         imageHbox.setSpacing(20);
-        imagecheck.setOnAction( e ->{
-            TextField filePath = new TextField();
-            if (imagecheck.isSelected()) {
+        imageCheck.setOnAction(e ->{
+            if (imageCheck.isSelected()) {
                 gridPane.add(filePath, 0, 10);
                 dialog.setHeight(dialog.getHeight() + 30);
             } else {
@@ -91,20 +95,40 @@ public class NewTrueFalseDialog{
                 if (param==okButton){
                     TrueFalse newTFQ;
                     if (trueToggle.isSelected()) {
-                        newTFQ = new TrueFalse(questionTextField.getText(), "True");
-                        dialog.getDialogPane().lookupButton(okButton).setDisable(true);
-                        clearFields();
-                        return newTFQ;
-                    } else if (falseToggle.isSelected()){
-                        newTFQ =new TrueFalse(questionTextField.getText(), "False");
-                        dialog.getDialogPane().lookupButton(okButton).setDisable(true);
-                        clearFields();
-                        return newTFQ;
+                        if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()) {
+                            try {
+                                Image image = new Image(new FileInputStream(filePath.getText()));
+                                return new TrueFalse(questionTextField.getText(), "True", image);
+                            } catch (IOException e) {
+                                System.out.println("Error: Could not find image - " + e.getMessage());
+                                return new TrueFalse(questionTextField.getText(), "True");
+                            }
+                        }
+                            newTFQ = new TrueFalse(questionTextField.getText(), "True");
+                            dialog.getDialogPane().lookupButton(okButton).setDisable(true);
+                            clearFields();
+                            return newTFQ;
+                        } else if (falseToggle.isSelected()){
+
+                        if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()) {
+                            try {
+                                Image image = new Image(new FileInputStream(filePath.getText()));
+                                return new TrueFalse(questionTextField.getText(), "False", image);
+                            } catch (IOException e) {
+                                System.out.println("Error: Could not find image - " + e.getMessage());
+                                return new TrueFalse(questionTextField.getText(), "False");
+                            }
+                        }
+                            newTFQ =new TrueFalse(questionTextField.getText(), "False");
+                            dialog.getDialogPane().lookupButton(okButton).setDisable(true);
+                            clearFields();
+                            return newTFQ;
+                        }
                     }
-                }
+
                 clearFields();
                 return null;
-            }
+                }
         });
     }
 

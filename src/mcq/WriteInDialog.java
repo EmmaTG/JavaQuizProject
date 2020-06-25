@@ -1,12 +1,16 @@
 package mcq;
 
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import mcq.Questions.WriteInQuestion;
 
-public class NewWriteInDialog {
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class WriteInDialog {
 
     private  Dialog<WriteInQuestion> dialog;
     private  Label label1 = new Label("Question: ");
@@ -16,10 +20,11 @@ public class NewWriteInDialog {
     private  ButtonType okButton = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
     private  ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
     private Label includeImage = new Label("Image");
-    private CheckBox imagecheck = new CheckBox();
+    private CheckBox imageCheck = new CheckBox();
+    private TextField filePath = new TextField();
 
 
-    public NewWriteInDialog() {
+    public WriteInDialog() {
         this.dialog = new Dialog<>();
     }
 
@@ -46,11 +51,10 @@ public class NewWriteInDialog {
         gridPane.add(label2, 0, 2);
         gridPane.add(answerTextField, 0, 3);
         gridPane.add(new Label(" "),0,8);
-        HBox imageHbox = new HBox(includeImage,imagecheck);
+        HBox imageHbox = new HBox(includeImage, imageCheck);
         imageHbox.setSpacing(20);
-        imagecheck.setOnAction( e ->{
-            TextField filePath = new TextField();
-            if (imagecheck.isSelected()) {
+        imageCheck.setOnAction(e ->{
+            if (imageCheck.isSelected()) {
                 gridPane.add(filePath, 0, 10);
                 dialog.setHeight(dialog.getHeight() + 30);
             }
@@ -80,6 +84,15 @@ public class NewWriteInDialog {
             @Override
             public WriteInQuestion call(ButtonType param) {
                 if (param == okButton) {
+                    if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()) {
+                        try {
+                            Image image = new Image(new FileInputStream(filePath.getText()));
+                            return new WriteInQuestion(questionTextField.getText(), answerTextField.getText(), image);
+                        } catch (IOException e) {
+                            System.out.println("Error: Could not find image - " + e.getMessage());
+                            return new WriteInQuestion(questionTextField.getText(), answerTextField.getText());
+                        }
+                    }
                     WriteInQuestion newWIQ = new WriteInQuestion(questionTextField.getText(), answerTextField.getText());
                     clearFields();
                     return newWIQ;

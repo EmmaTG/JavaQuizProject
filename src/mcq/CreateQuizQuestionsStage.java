@@ -65,7 +65,7 @@ public class CreateQuizQuestionsStage {
             Question selectQuestion = listView.getSelectionModel().getSelectedItem();
             int selectedQuestionInt = listView.getSelectionModel().getSelectedIndex();
             if (selectQuestion instanceof TrueFalse) {
-                NewTrueFalseDialog dialogObject = new NewTrueFalseDialog();
+                TrueFalseDialog dialogObject = new TrueFalseDialog();
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getTrueToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("true"));
                 dialogObject.getFalseToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("false"));
@@ -80,7 +80,7 @@ public class CreateQuizQuestionsStage {
 
                 }
             } else if (selectQuestion instanceof WriteInQuestion){
-                NewWriteInDialog dialogObject = new NewWriteInDialog();
+                WriteInDialog dialogObject = new WriteInDialog();
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
 //                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
@@ -93,7 +93,7 @@ public class CreateQuizQuestionsStage {
                     }
                 }
             } else if (selectQuestion instanceof MultipleChoiceQuestion){
-                NewMCQDialog dialogObject = new NewMCQDialog();
+                MCQDialog dialogObject = new MCQDialog();
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
                 dialogObject.getFalseAnswerTextField1().setText(selectQuestion.getOptions().get(0));
