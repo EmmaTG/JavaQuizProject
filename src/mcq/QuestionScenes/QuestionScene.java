@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -32,6 +33,7 @@ public class QuestionScene<T extends Question> {
 
     protected GridPane questionWindow;
     private List<Button> possibleAnswers; //List of buttons with the first one being the correct answer;
+    private ImageView questionImage;
     private double time; //length of question
 
     public QuestionScene(T question) {
@@ -69,17 +71,36 @@ public class QuestionScene<T extends Question> {
         }
         VBox optionsVBox = questionHeading(question,questionNumber);
 
-
         for (HBox hBox: hboxes) {
             optionsVBox.getChildren().add(hBox);
         }
-
         optionsVBox.setAlignment(Pos.CENTER);
         optionsVBox.setSpacing(10);
 
+        setQuestionWindow(question, optionsVBox, progressHBox);
+
+    }
+
+    public void setQuestionWindow(Question question, VBox vbox, HBox hbox){
         questionWindow = new GridPane();
-        questionWindow.add(optionsVBox, 0,0);
-        questionWindow.add(progressHBox, 0, 1);
+        questionWindow.setVgap(10);
+        if (question.getQuestionImage() != null){
+            ImageView imageView = getImage();
+            questionWindow.add(imageView, 0, 0);
+            questionWindow.add(vbox, 0,1);
+            questionWindow.add(hbox, 0, 2);
+            return;
+        }
+
+        questionWindow.add(vbox, 0,0);
+        questionWindow.add(hbox, 0, 1);
+    }
+
+    public ImageView getImage(){
+        ImageView imageView = new ImageView(question.getQuestionImage());
+        imageView.setFitWidth( sceneWidth-100);
+        imageView.setPreserveRatio(true);
+        return imageView;
     }
     public Stage getQuestionStage() {
         newStage = new Stage();
@@ -116,7 +137,7 @@ public class QuestionScene<T extends Question> {
     public <T extends Question> VBox questionHeading(T question, int questionNumber){
         Label heading = new Label("Question " + questionNumber);
         heading.getStyleClass().add("questionNumber");
-        heading.setPrefHeight(50);
+        heading.setPrefHeight(30);
         heading.setPrefWidth(sceneWidth);
         heading.setWrapText(true);
         Label questionToAnswer = new Label(question.getQuestion());
@@ -131,8 +152,4 @@ public class QuestionScene<T extends Question> {
         return optionsVBox;
     }
 
-//    public void addImage(){
-//        // Create an image
-//        Image image = new Image(new FileStream)
-//    }
 }

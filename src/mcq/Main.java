@@ -53,8 +53,17 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        NewWriteInDialog dialogObject = new NewWriteInDialog();
-        dialogObject.getDialog().show();
+        Quiz testQuiz = new Quiz("Test");
+        List<Question> questionList = new ArrayList<>();
+        NewMCQDialog dialogObject = new NewMCQDialog();
+       Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
+       if (result.isPresent()){
+           MultipleChoiceQuestion mcq = result.get();
+            questionList.add(mcq);
+            runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
+
+       }
+
 //        homeScreen("Welcome!");
 
     }
@@ -298,7 +307,7 @@ public class Main extends Application {
                 correctAlert.setHeaderText("Correct!");
                 correctAlert.setTitle("Well done!");
                 try{
-                    ImageView imageView = getimageNode("/home/etg/Desktop/JavaQuizProject/src/mcq/correctImage.png");
+                    ImageView imageView = getImageNode("/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/correctImage.png");
                     imageView.setFitHeight(50);
                     imageView.setFitWidth(50);
                     correctAlert.setGraphic(imageView);
@@ -313,7 +322,7 @@ public class Main extends Application {
                 inCorrectAlert.setHeaderText("Incorrect!");
                 inCorrectAlert.setTitle("Whoops!");
                 try{
-                    ImageView imageView = getimageNode("/home/etg/Desktop/JavaQuizProject/src/mcq/incorrectImage.png");
+                    ImageView imageView = getImageNode("/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/incorrectImage.png");
                     imageView.setFitHeight(50);
                     imageView.setFitWidth(50);
                     inCorrectAlert.setGraphic(imageView);
@@ -408,7 +417,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    private static ImageView getimageNode(String filePath) throws FileNotFoundException{
+    private static ImageView getImageNode(String filePath) throws FileNotFoundException{
         Image image = new Image(new FileInputStream(filePath));
         // Setting new image
         return new ImageView(image);

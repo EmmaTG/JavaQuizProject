@@ -1,11 +1,14 @@
 package mcq;
 
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import mcq.Questions.MultipleChoiceQuestion;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class NewMCQDialog {
     private  ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
     private Label includeImage = new Label("Image");
     private CheckBox imagecheck = new CheckBox();
+    private TextField filePath = new TextField();
 
     public NewMCQDialog() {
         this.dialog = new Dialog<>();
@@ -71,7 +75,6 @@ public class NewMCQDialog {
         HBox imageHbox = new HBox(includeImage,imagecheck);
         imageHbox.setSpacing(20);
         imagecheck.setOnAction( e ->{
-            TextField filePath = new TextField();
             if (imagecheck.isSelected()){
             gridPane.add(filePath, 0, 10);
             dialog.setHeight(dialog.getHeight()+30);
@@ -93,17 +96,18 @@ public class NewMCQDialog {
         dialog.getDialogPane().setContent(gridPane);
         dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
 
+        boolean disableButton;
         questionTextField.setOnKeyReleased(e -> okayButtonRelease());
         answerTextField.setOnKeyReleased(e -> okayButtonRelease());
         falseAnswerTextField1.setOnKeyReleased(e -> okayButtonRelease());
         falseAnswerTextField2.setOnKeyReleased(e -> okayButtonRelease());
         falseAnswerTextField3.setOnKeyReleased(e -> okayButtonRelease());
+        disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                    answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty() ||
+                    falseAnswerTextField1.getText().isEmpty() || falseAnswerTextField1.getText().trim().isEmpty() ||
+                    falseAnswerTextField2.getText().isEmpty() || falseAnswerTextField2.getText().trim().isEmpty() ||
+                    falseAnswerTextField3.getText().isEmpty() || falseAnswerTextField3.getText().trim().isEmpty();
 
-        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
-                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty() ||
-                falseAnswerTextField1.getText().isEmpty() || falseAnswerTextField1.getText().trim().isEmpty() ||
-                falseAnswerTextField2.getText().isEmpty() || falseAnswerTextField2.getText().trim().isEmpty() ||
-                falseAnswerTextField3.getText().isEmpty() || falseAnswerTextField3.getText().trim().isEmpty();
 
         dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
 
@@ -118,6 +122,16 @@ public class NewMCQDialog {
                             falseAnswerTextField2.getText(),
                             falseAnswerTextField3.getText());
                     dialog.getDialogPane().lookupButton(okButton).setDisable(true);
+                    if (imagecheck.isSelected() && !filePath.getText().trim().isEmpty()){
+                        try{
+                            Image image = new Image(new FileInputStream(filePath.getText()));
+                            clearFields();
+                            return new MultipleChoiceQuestion(questionText,answerText, answerOptions,image);
+                        } catch (IOException e){
+                            System.out.println("Error: Could not find image - " + e.getMessage());
+                            return new MultipleChoiceQuestion(questionText,answerText, answerOptions);
+                        }
+                    }
                     clearFields();
                     return new MultipleChoiceQuestion(questionText,answerText, answerOptions);
                 }
@@ -132,6 +146,8 @@ public class NewMCQDialog {
         falseAnswerTextField1.clear();
         falseAnswerTextField2.clear();
         falseAnswerTextField3.clear();
+        imagecheck.setSelected(false);
+        filePath.clear();
 
     }
 
