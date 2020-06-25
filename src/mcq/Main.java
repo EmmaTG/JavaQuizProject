@@ -61,19 +61,19 @@ public class Main extends Application {
            MultipleChoiceQuestion mcq = result.get();
             questionList.add(mcq);
        }
-       WriteInDialog dialogObject2 = new WriteInDialog();
-        Optional<WriteInQuestion> result2 = dialogObject2.getDialog().showAndWait();
-        if (result2.isPresent()){
-            WriteInQuestion q = result2.get();
-            questionList.add(q);
-        }
-
-        TrueFalseDialog dialog3 = new TrueFalseDialog();
-        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
-        if (tfResult.isPresent()){
-            TrueFalse tf = tfResult.get();
-            questionList.add(tf);
-        }
+//       WriteInDialog dialogObject2 = new WriteInDialog();
+//        Optional<WriteInQuestion> result2 = dialogObject2.getDialog().showAndWait();
+//        if (result2.isPresent()){
+//            WriteInQuestion q = result2.get();
+//            questionList.add(q);
+//        }
+//
+//        TrueFalseDialog dialog3 = new TrueFalseDialog();
+//        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
+//        if (tfResult.isPresent()){
+//            TrueFalse tf = tfResult.get();
+//            questionList.add(tf);
+//        }
 
         runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
 

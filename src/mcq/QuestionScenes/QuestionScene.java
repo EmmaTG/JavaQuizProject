@@ -85,7 +85,7 @@ public class QuestionScene<T extends Question> {
         questionWindow = new GridPane();
         questionWindow.setVgap(10);
         if (question.getQuestionImage() != null){
-            ImageView imageView = getImage();
+            HBox imageView = getImage();
             questionWindow.add(imageView, 0, 0);
             questionWindow.add(vbox, 0,1);
             questionWindow.add(hbox, 0, 2);
@@ -96,12 +96,15 @@ public class QuestionScene<T extends Question> {
         questionWindow.add(hbox, 0, 1);
     }
 
-    public ImageView getImage(){
+    private HBox  getImage(){
         ImageView imageView = new ImageView(question.getQuestionImage());
         imageView.setFitWidth( sceneWidth-100);
         imageView.setPreserveRatio(true);
-        return imageView;
+        HBox imgHbox = new HBox(imageView);
+        imgHbox.setAlignment(Pos.CENTER);
+        return imgHbox;
     }
+
     public Stage getQuestionStage() {
         newStage = new Stage();
         newScene = new Scene(questionWindow);
