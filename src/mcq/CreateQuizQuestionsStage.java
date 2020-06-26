@@ -69,7 +69,6 @@ public class CreateQuizQuestionsStage {
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getTrueToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("true"));
                 dialogObject.getFalseToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("false"));
-//                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
                 Optional<TrueFalse> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     TrueFalse tf = result.get();
@@ -83,7 +82,6 @@ public class CreateQuizQuestionsStage {
                 WriteInDialog dialogObject = new WriteInDialog();
                 dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
                 dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
-//                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
                 Optional<WriteInQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     WriteInQuestion wi = result.get();
@@ -99,7 +97,6 @@ public class CreateQuizQuestionsStage {
                 dialogObject.getFalseAnswerTextField1().setText(selectQuestion.getOptions().get(0));
                 dialogObject.getFalseAnswerTextField2().setText(selectQuestion.getOptions().get(1));
                 dialogObject.getFalseAnswerTextField3().setText(selectQuestion.getOptions().get(2));
-//                dialogObject.getDialog().getDialogPane().lookupButton(dialogObject.getOkButton()).setDisable(false);
                 Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     MultipleChoiceQuestion mcq = result.get();

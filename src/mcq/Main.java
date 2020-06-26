@@ -55,12 +55,12 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Quiz testQuiz = new Quiz("Test");
         List<Question> questionList = new ArrayList<>();
-        MCQDialog dialogObject = new MCQDialog();
-       Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
-       if (result.isPresent()){
-           MultipleChoiceQuestion mcq = result.get();
-            questionList.add(mcq);
-       }
+//        MCQDialog dialogObject = new MCQDialog();
+//       Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
+//       if (result.isPresent()){
+//           MultipleChoiceQuestion mcq = result.get();
+//            questionList.add(mcq);
+//       }
 //       WriteInDialog dialogObject2 = new WriteInDialog();
 //        Optional<WriteInQuestion> result2 = dialogObject2.getDialog().showAndWait();
 //        if (result2.isPresent()){
@@ -68,12 +68,12 @@ public class Main extends Application {
 //            questionList.add(q);
 //        }
 //
-//        TrueFalseDialog dialog3 = new TrueFalseDialog();
-//        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
-//        if (tfResult.isPresent()){
-//            TrueFalse tf = tfResult.get();
-//            questionList.add(tf);
-//        }
+        TrueFalseDialog dialog3 = new TrueFalseDialog();
+        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
+        if (tfResult.isPresent()){
+            TrueFalse tf = tfResult.get();
+            questionList.add(tf);
+        }
 
         runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
 
@@ -135,18 +135,15 @@ public class Main extends Application {
     }
 
     public static ObservableList<QuestionScene> createQuestionScenes(List<Question> listOfQuestions) {
+
+        QuestionScene.resetQuestionNumbers();
+
         ObservableList<Question> observableListOfQuestions = FXCollections.observableArrayList(listOfQuestions);
         FXCollections.shuffle(observableListOfQuestions);
 
-        ObservableList<QuestionScene> questionScenesObservList;
-        List<QuestionScene> questionScenes = new ArrayList<>();
-
-
         QuestionScene questionScene;
-        QuestionScene.resetQuestionNumbers();
         WriteInQuestionScene writeInQuestionScene;
-
-
+        List<QuestionScene> questionScenes = new ArrayList<>();
         for (Question q : observableListOfQuestions) {
             if (q instanceof MultipleChoiceQuestion) {
                 questionScene = new QuestionScene(q);
@@ -157,7 +154,7 @@ public class Main extends Application {
             }
         }
 
-        questionScenesObservList = FXCollections.observableArrayList(questionScenes);
+        ObservableList<QuestionScene> questionScenesObservList = FXCollections.observableArrayList(questionScenes);
         return questionScenesObservList;
     }
 
@@ -268,7 +265,6 @@ public class Main extends Application {
             return;
         });
 
-//        doneButton.setDisable(true);
 
         typeOfQStage.setOnCloseRequest(e -> {
             windowClose = true;
@@ -289,10 +285,9 @@ public class Main extends Application {
         int count = 0;
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
-                //        Stage qsStage;
+
                 Stage qsStage;
                 qs.setPossibleAnswers();
-                ObservableList<Button> questionButtons = qs.getPossibleAnswers();
 
                 ProgressBar progressBar = new ProgressBar(((double) count / (double) listOfQuestionScenes.size()));
                 progressBar.prefWidth(Double.MAX_VALUE);
@@ -303,9 +298,9 @@ public class Main extends Application {
                 count++;
                 HBox progressHBox = new HBox(progressBar,progressLabel,progressLabel2);
                 progressHBox.setAlignment(Pos.CENTER);
-//                gridPane.add(progressHBox, 0, 1);
 
-                qs.setQuestionWindow(questionButtons,progressHBox);
+                ObservableList<Button> questionButtons = qs.getPossibleAnswers();
+                qs.setQuestionWindow(questionButtons, progressHBox);
 
                 qsStage = qs.getQuestionStage();
 
@@ -316,37 +311,16 @@ public class Main extends Application {
                 });
 
                 // Correct answer dialog
-                Alert correctAlert = new Alert(Alert.AlertType.INFORMATION);
-                correctAlert.setHeaderText("Correct!");
-                correctAlert.setTitle("Well done!");
-                try{
-                    ImageView imageView = getImageNode("/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/correctImage.png");
-                    imageView.setFitHeight(50);
-                    imageView.setFitWidth(50);
-                    correctAlert.setGraphic(imageView);
-                } catch (FileNotFoundException e) {
-                    System.out.println("Correct image file not found: " + e.getMessage());
-                }
-
-                correctAlert.getDialogPane().getStylesheets().add(Main.class.getResource("AlertsCSS.css").toExternalForm());
+                Alert correctAlert = createAlert("Correct!","Well done!","/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/correctImage.png");
                 correctAlert.getDialogPane().getStyleClass().add("correctDialog");
 
-                Alert inCorrectAlert = new Alert(Alert.AlertType.INFORMATION);
-                inCorrectAlert.setHeaderText("Incorrect!");
-                inCorrectAlert.setTitle("Whoops!");
-                try{
-                    ImageView imageView = getImageNode("/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/incorrectImage.png");
-                    imageView.setFitHeight(50);
-                    imageView.setFitWidth(50);
-                    inCorrectAlert.setGraphic(imageView);
-                } catch (FileNotFoundException e) {
-                    System.out.println("Correct image file not found: " + e.getMessage());
-                }
-
-                inCorrectAlert.getDialogPane().getStylesheets().add(Main.class.getResource("AlertsCSS.css").toExternalForm());
+                // Incorrect answer dialog
+                Alert inCorrectAlert = createAlert("Incorrect!", "Whoops!", "/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/incorrectImage.png");
                 inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
 
                 FXCollections.shuffle(questionButtons);
+
+
                 if (qs.getQuestion() instanceof MultipleChoiceQuestion || qs.getQuestion() instanceof TrueFalse) {
                     for (Button b : questionButtons) {
                         if (b.getText().equalsIgnoreCase(qs.getQuestion().getCorrectAnswer())) {
@@ -370,6 +344,8 @@ public class Main extends Application {
                         }
                     }
                 }
+
+
                 if (qs.getQuestion() instanceof WriteInQuestion) {
                     TextField answerField = ((WriteInQuestionScene) qs).getAnswerField();
                     answerField.setOnAction(new EventHandler<ActionEvent>() {
@@ -402,27 +378,49 @@ public class Main extends Application {
             sb.append("\n");
             sb.append("\t" + (((float) correctAnswers / listOfQuestionScenes.size()) * 100) + "%\t");
 
-            Alert finalAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            finalAlert.setTitle("Results");
-            finalAlert.setHeaderText("Quiz Complete!");
-            finalAlert.setContentText(sb.toString());
+            resultsSummary(sb.toString());
 
-            ButtonType quitButton = new ButtonType("Quit");
-            ButtonType newQuiz = new ButtonType("Start a new quiz");
-
-            finalAlert.getButtonTypes().setAll(newQuiz, quitButton);
-
-            finalAlert.setOnCloseRequest(e -> finalAlert.close());
-
-            Optional<ButtonType> result = finalAlert.showAndWait();
-            if (result.get() == newQuiz) {
-                finalAlert.close();
-                homeScreen("");
-            } else {
-                Platform.exit();
-            }
         } else if (windowClose && homeScreen) {
             homeScreen("");
+        }
+    }
+
+    private static Alert createAlert(String headerText, String titleText, String imagePath){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(headerText);
+        alert.setTitle(titleText);
+        try{
+            ImageView imageView = getImageNode(imagePath);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            alert.setGraphic(imageView);
+        } catch (FileNotFoundException e) {
+            System.out.println("Correct image file not found: " + e.getMessage());
+        }
+
+        alert.getDialogPane().getStylesheets().add(Main.class.getResource("AlertsCSS.css").toExternalForm());
+
+        return alert;
+    }
+
+    private static void resultsSummary(String contentText){
+        Alert finalAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        finalAlert.setTitle("Results");
+        finalAlert.setHeaderText("Quiz Complete!");
+        finalAlert.setContentText(contentText);
+
+        ButtonType quitButton = new ButtonType("Quit");
+        ButtonType newQuiz = new ButtonType("Start a new quiz");
+
+        finalAlert.getButtonTypes().setAll(newQuiz, quitButton);
+
+        finalAlert.setOnCloseRequest(e -> finalAlert.close());
+        Optional<ButtonType> result = finalAlert.showAndWait();
+        if (result.get().getText().equalsIgnoreCase("Start a new quiz")) {
+            finalAlert.close();
+            homeScreen("");
+        } else {
+            Platform.exit();
         }
     }
 
@@ -436,5 +434,4 @@ public class Main extends Application {
         return new ImageView(image);
 
     }
-
 }
