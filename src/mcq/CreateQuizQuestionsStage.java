@@ -22,7 +22,6 @@ import java.util.Optional;
 
 public class CreateQuizQuestionsStage {
 
-    private VBox vBox;
     private Stage newStage;
     private Quiz createdQuiz;
     private static ObservableList<Question> observableQuestionList;
@@ -55,9 +54,7 @@ public class CreateQuizQuestionsStage {
 
         Button newQuestion = new Button("New Question");
         newQuestion.setMaxWidth(Double.MAX_VALUE);
-        newQuestion.setOnAction(e -> {
-            Main.typeOfQuestionToCreate(createdQuiz);
-        });
+        newQuestion.setOnAction(e -> Main.typeOfQuestionToCreate(createdQuiz));
 
         Button editButton = new Button("Edit");
         editButton.setMaxWidth(Double.MAX_VALUE);
@@ -72,11 +69,8 @@ public class CreateQuizQuestionsStage {
                 Optional<TrueFalse> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     TrueFalse tf = result.get();
-                    if (tf!=null) {
                         observableQuestionList.set(selectedQuestionInt, tf);
                         createdQuiz.updateQuestion(selectedQuestionInt, tf);
-                    }
-
                 }
             } else if (selectQuestion instanceof WriteInQuestion){
                 WriteInDialog dialogObject = new WriteInDialog();
@@ -85,10 +79,8 @@ public class CreateQuizQuestionsStage {
                 Optional<WriteInQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     WriteInQuestion wi = result.get();
-                    if (wi != null) {
                         observableQuestionList.set(selectedQuestionInt, wi);
                         createdQuiz.updateQuestion(selectedQuestionInt, wi);
-                    }
                 }
             } else if (selectQuestion instanceof MultipleChoiceQuestion){
                 MCQDialog dialogObject = new MCQDialog();
@@ -100,10 +92,8 @@ public class CreateQuizQuestionsStage {
                 Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
                 if (result.isPresent()) {
                     MultipleChoiceQuestion mcq = result.get();
-                    if (mcq != null) {
                         observableQuestionList.set(selectedQuestionInt, mcq);
                         createdQuiz.updateQuestion(selectedQuestionInt, mcq);
-                    }
                 }
             } else {
                 System.out.println("No question selected");
@@ -119,12 +109,7 @@ public class CreateQuizQuestionsStage {
             createdQuiz.removeQuestion(selectQuestion);
         });
 
-        Runnable saveRunnable = new Runnable() {
-            @Override
-            public void run() {
-                QuestionDataSource.getInstance().saveNewQuiz(createdQuiz);
-            }
-        };
+        Runnable saveRunnable = () -> QuestionDataSource.getInstance().saveNewQuiz(createdQuiz);
 
         Button saveQuiz = new Button("Save and play later");
         saveQuiz.setMaxWidth(Double.MAX_VALUE);
@@ -151,7 +136,7 @@ public class CreateQuizQuestionsStage {
             Main.homeScreen("");
         });
 
-        vBox = new VBox();
+        VBox vBox = new VBox();
         vBox.getChildren().setAll(FXCollections.observableArrayList(newQuestion,editButton,deleteButton,playQuiz,saveQuiz,cancel));
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);

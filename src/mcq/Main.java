@@ -53,8 +53,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Quiz testQuiz = new Quiz("Test");
-        List<Question> questionList = new ArrayList<>();
+//        Quiz testQuiz = new Quiz("Test");
+//        List<Question> questionList = new ArrayList<>();
 //        MCQDialog dialogObject = new MCQDialog();
 //       Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
 //       if (result.isPresent()){
@@ -68,16 +68,16 @@ public class Main extends Application {
 //            questionList.add(q);
 //        }
 //
-        TrueFalseDialog dialog3 = new TrueFalseDialog();
-        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
-        if (tfResult.isPresent()){
-            TrueFalse tf = tfResult.get();
-            questionList.add(tf);
-        }
+//        TrueFalseDialog dialog3 = new TrueFalseDialog();
+//        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
+//        if (tfResult.isPresent()){
+//            TrueFalse tf = tfResult.get();
+//            questionList.add(tf);
+//        }
+//
+//        runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
 
-        runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
-
-//        homeScreen("Welcome!");
+        homeScreen("Welcome!");
 
     }
 
@@ -373,12 +373,9 @@ public class Main extends Application {
         }
 
         if (!windowClose) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Your Score:" + correctAnswers + "/" + listOfQuestionScenes.size());
-            sb.append("\n");
-            sb.append("\t" + (((float) correctAnswers / listOfQuestionScenes.size()) * 100) + "%\t");
-
-            resultsSummary(sb.toString());
+            String s =String.format("Your Score: %d / %d \n \t %f \t %%", correctAnswers, listOfQuestionScenes.size(),
+                    Math.ceil(((double) correctAnswers / listOfQuestionScenes.size()) * 100));
+            resultsSummary(s);
 
         } else if (windowClose && homeScreen) {
             homeScreen("");
@@ -416,11 +413,13 @@ public class Main extends Application {
 
         finalAlert.setOnCloseRequest(e -> finalAlert.close());
         Optional<ButtonType> result = finalAlert.showAndWait();
-        if (result.get().getText().equalsIgnoreCase("Start a new quiz")) {
-            finalAlert.close();
-            homeScreen("");
-        } else {
-            Platform.exit();
+        if (result.isPresent()) {
+            if (result.get().getText().equalsIgnoreCase("Start a new quiz")) {
+                finalAlert.close();
+                homeScreen("");
+            } else {
+                Platform.exit();
+            }
         }
     }
 
