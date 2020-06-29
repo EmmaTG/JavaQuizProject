@@ -100,38 +100,43 @@ public class Main extends Application {
         homeScreen = false;
 
         OpeningScene openingScene = new OpeningScene();
-        Button createQuizButton = openingScene.getCreateQuiz();
-        createQuizButton.setMaxWidth(Double.MAX_VALUE);
         openingScene.setWelcomeLabelText(message);
-        Button existingQuizButton = openingScene.getExistingQuiz();
-        existingQuizButton.setMaxWidth(Double.MAX_VALUE);
-        Button quitQuizButton = openingScene.getQuitQuiz();
-        quitQuizButton.setMaxWidth(Double.MAX_VALUE);
 
-
-        createQuizButton.onActionProperty().setValue(e -> {
+        //1. Create a new quiz
+        Button createQuizButton = openingScene.getCreateQuiz();
+        createQuizButton.onActionProperty().setValue(event -> {
             window.close();
-            CreateNewQuizStage nameQuiz = new CreateNewQuizStage();
-            Stage nameQuizStage = nameQuiz.getNewStage();
-            nameQuizStage.showAndWait();
-
-            CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage();
-            createQuizQuestions.setCreatedQuiz(nameQuiz.getQuizTitle());
-            Stage createQuizQuestionsStage = createQuizQuestions.getNewStage();
-            createQuizQuestionsStage.showAndWait();
+            createQuiz();
         });
 
+        //2. Use an existing quiz from the database
+        Button existingQuizButton = openingScene.getExistingQuiz();
         existingQuizButton.onActionProperty().setValue(e -> {
             window.close();
             selectQuiz();
         });
+
+        //3. Quit Application
+        Button quitQuizButton = openingScene.getQuitQuiz();
         quitQuizButton.onActionProperty().setValue(event -> {
             window.close();
         });
 
-
         window.setScene(openingScene.getScene());
         window.show();
+    }
+
+    private static void createQuiz(){
+
+        //1. Give new quiz a name
+        CreateNewQuizStage nameQuiz = new CreateNewQuizStage();
+        Stage nameQuizStage = nameQuiz.getNewStage();
+        nameQuizStage.showAndWait();
+
+        //2. Open create quiz stage
+        CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
+        Stage createQuizQuestionsStage = createQuizQuestions.getNewStage();
+        createQuizQuestionsStage.showAndWait();
     }
 
     public static ObservableList<QuestionScene> createQuestionScenes(List<Question> listOfQuestions) {
@@ -235,19 +240,16 @@ public class Main extends Application {
             if (createQuestion(newQuiz, questionType.MCQ)) {
                 property.set(property.get() + 1);
             }
-            return;
         });
         tfButton.setOnAction(e -> {
             if (createQuestion(newQuiz, questionType.TF)) {
                 property.set(property.get() + 1);
             }
-            return;
         });
         wiButton.setOnAction(e -> {
             if (createQuestion(newQuiz,questionType.WI)) {
                 property.set(property.get() + 1);
             }
-            return;
         });
         doneButton.setOnAction(e -> {
             CreateQuizQuestionsStage.setObservableQuestionList(newQuiz.getQuestions());
@@ -255,27 +257,36 @@ public class Main extends Application {
             windowClose = true;
             homeScreen = true;
             typeOfQStage.close();
-            return;
         });
 
         quitButton.setOnAction(e -> {
             typeOfQStage.close();
             windowClose = true;
             homeScreen = true;
-            return;
         });
 
 
         typeOfQStage.setOnCloseRequest(e -> {
             windowClose = true;
             homeScreen = true;
-            return;
         });
 
         Scene typeOfQScene = new Scene(gridPane);
         typeOfQStage.setScene(typeOfQScene);
         typeOfQStage.setTitle("Type of question");
         typeOfQStage.showAndWait();
+    }
+
+    private static HBox setProgressBar(int counter, int listOfQuestionScenes){
+        ProgressBar progressBar = new ProgressBar(((double) counter / (double) listOfQuestionScenes));
+        progressBar.prefWidth(Double.MAX_VALUE);
+        Label progressLabel = new Label();
+        IntegerProperty intProperty = new SimpleIntegerProperty(counter);
+        progressLabel.textProperty().bind(intProperty.asString());
+        Label progressLabel2 = new Label("/" + listOfQuestionScenes);
+        HBox progressHBox = new HBox(progressBar,progressLabel,progressLabel2);
+        progressHBox.setAlignment(Pos.CENTER);
+        return  progressHBox;
     }
 
     public static void runQuiz(ObservableList<QuestionScene> listOfQuestionScenes) {
@@ -287,21 +298,13 @@ public class Main extends Application {
             if (!windowClose) {
 
                 Stage qsStage;
-                qs.setPossibleAnswers();
 
-                ProgressBar progressBar = new ProgressBar(((double) count / (double) listOfQuestionScenes.size()));
-                progressBar.prefWidth(Double.MAX_VALUE);
-                Label progressLabel = new Label();
-                IntegerProperty intProperty = new SimpleIntegerProperty(count);
-                progressLabel.textProperty().bind(intProperty.asString());
-                Label progressLabel2 = new Label("/" + listOfQuestionScenes.size());
+                HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
                 count++;
-                HBox progressHBox = new HBox(progressBar,progressLabel,progressLabel2);
-                progressHBox.setAlignment(Pos.CENTER);
 
+                qs.setPossibleAnswers();
                 ObservableList<Button> questionButtons = qs.getPossibleAnswers();
-                qs.setQuestionWindow(questionButtons, progressHBox);
-
+                qs.setQuestionWindow(questionButtons, progressBar);
                 qsStage = qs.getQuestionStage();
 
                 qsStage.setOnCloseRequest(we -> {
@@ -366,9 +369,6 @@ public class Main extends Application {
 
                 qsStage.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
                 qsStage.showAndWait();
-//            } else {
-////                homeScreen(""); // If uncommented it will bring up the homescreen page when the close window button
-//                // is pressed, alternatively if commented, the program will exit.
             }
         }
 

@@ -38,8 +38,11 @@ public class OpeningScene {
         scene.getStylesheets().add(Main.class.getResource("OpeningSceneCSS.css").toExternalForm());
         gridPane.getStyleClass().add("myGrid");
         createQuiz.getStyleClass().add("createQuizButton");
+        createQuiz.setMaxWidth(Double.MAX_VALUE);
         existingQuiz.getStyleClass().add("existingQuizButton");
+        existingQuiz.setMaxWidth(Double.MAX_VALUE);
         quitQuiz.getStyleClass().add("quitQuizButton");
+        quitQuiz.setMaxWidth(Double.MAX_VALUE);
         welcomeLabel.getStyleClass().add("welcomeLabel");
         userPrompt.getStyleClass().add("userPrompt");
         return scene;

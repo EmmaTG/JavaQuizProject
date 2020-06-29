@@ -26,7 +26,8 @@ public class CreateQuizQuestionsStage {
     private Quiz createdQuiz;
     private static ObservableList<Question> observableQuestionList;
 
-    public CreateQuizQuestionsStage() {
+    public CreateQuizQuestionsStage(String quizTitle) {
+        this.createdQuiz = new Quiz(quizTitle);
     }
 
     public void setCreatedQuiz(String quizTitle) {
@@ -61,44 +62,7 @@ public class CreateQuizQuestionsStage {
         editButton.setOnAction(e -> {
             Question selectQuestion = listView.getSelectionModel().getSelectedItem();
             int selectedQuestionInt = listView.getSelectionModel().getSelectedIndex();
-            if (selectQuestion instanceof TrueFalse) {
-                TrueFalseDialog dialogObject = new TrueFalseDialog();
-                dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
-                dialogObject.getTrueToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("true"));
-                dialogObject.getFalseToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("false"));
-                Optional<TrueFalse> result = dialogObject.getDialog().showAndWait();
-                if (result.isPresent()) {
-                    TrueFalse tf = result.get();
-                        observableQuestionList.set(selectedQuestionInt, tf);
-                        createdQuiz.updateQuestion(selectedQuestionInt, tf);
-                }
-            } else if (selectQuestion instanceof WriteInQuestion){
-                WriteInDialog dialogObject = new WriteInDialog();
-                dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
-                dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
-                Optional<WriteInQuestion> result = dialogObject.getDialog().showAndWait();
-                if (result.isPresent()) {
-                    WriteInQuestion wi = result.get();
-                        observableQuestionList.set(selectedQuestionInt, wi);
-                        createdQuiz.updateQuestion(selectedQuestionInt, wi);
-                }
-            } else if (selectQuestion instanceof MultipleChoiceQuestion){
-                MCQDialog dialogObject = new MCQDialog();
-                dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
-                dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
-                dialogObject.getFalseAnswerTextField1().setText(selectQuestion.getOptions().get(0));
-                dialogObject.getFalseAnswerTextField2().setText(selectQuestion.getOptions().get(1));
-                dialogObject.getFalseAnswerTextField3().setText(selectQuestion.getOptions().get(2));
-                Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
-                if (result.isPresent()) {
-                    MultipleChoiceQuestion mcq = result.get();
-                        observableQuestionList.set(selectedQuestionInt, mcq);
-                        createdQuiz.updateQuestion(selectedQuestionInt, mcq);
-                }
-            } else {
-                System.out.println("No question selected");
-            }
-
+            EditAction(selectQuestion, selectedQuestionInt);
         });
 
         Button deleteButton = new Button("Delete");
@@ -148,5 +112,54 @@ public class CreateQuizQuestionsStage {
         newStage.setScene(newScene);
 
         return newStage;
+    }
+
+
+    private void EditAction(Question question, int questionNumber){
+        Optional<? extends Question> result;
+        if (question instanceof TrueFalse) {
+            result = editTrueFalse((TrueFalse) question);
+            setEditedQuestion(result, questionNumber);
+        } else if (question instanceof WriteInQuestion){
+            result = editWriteIn((WriteInQuestion) question);
+            setEditedQuestion(result, questionNumber);
+        } else if (question instanceof MultipleChoiceQuestion){
+            result = editMCQ((MultipleChoiceQuestion) question);
+            setEditedQuestion(result, questionNumber);
+        } else {
+            System.out.println("No question selected");
+        }
+    }
+
+    private Optional<? extends Question> editTrueFalse(TrueFalse selectQuestion){
+        TrueFalseDialog dialogObject = new TrueFalseDialog();
+        dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
+        dialogObject.getTrueToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("true"));
+        dialogObject.getFalseToggle().setSelected(selectQuestion.getCorrectAnswer().equalsIgnoreCase("false"));
+        return dialogObject.getDialog().showAndWait();
+    }
+
+    private Optional<? extends Question> editWriteIn(WriteInQuestion selectQuestion){
+        WriteInDialog dialogObject = new WriteInDialog();
+        dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
+        dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
+        return dialogObject.getDialog().showAndWait();
+    }
+
+    private Optional<? extends Question> editMCQ(MultipleChoiceQuestion selectQuestion){
+        MCQDialog dialogObject = new MCQDialog();
+        dialogObject.getQuestionTextField().setText(selectQuestion.getQuestion());
+        dialogObject.getAnswerTextField().setText(selectQuestion.getCorrectAnswer());
+        dialogObject.getFalseAnswerTextField1().setText(selectQuestion.getOptions().get(0));
+        dialogObject.getFalseAnswerTextField2().setText(selectQuestion.getOptions().get(1));
+        dialogObject.getFalseAnswerTextField3().setText(selectQuestion.getOptions().get(2));
+        return dialogObject.getDialog().showAndWait();
+    }
+
+    private void setEditedQuestion(Optional<? extends Question> result, int questionNumber){
+        if (result.isPresent()) {
+            observableQuestionList.set(questionNumber, result.get());
+            createdQuiz.updateQuestion(questionNumber, result.get());
+        }
     }
 }
