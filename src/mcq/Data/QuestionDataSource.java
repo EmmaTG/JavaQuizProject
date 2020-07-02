@@ -119,6 +119,25 @@ public class QuestionDataSource {
         }
     }
 
+    public void deleteQuiz(String quizName) {
+        int QuizID = queryQuizID(quizName);
+        if (QuizID == -1) {
+            System.out.println("Error getting quiz _id");
+            return;
+        }
+        String sql = "DELETE FROM " + TABLE_QUIZ +
+                " WHERE " + COLUMN_QUIZ_NAME + "=\"" + quizName + "\"";
+        String sql2 = "DELETE FROM " + TABLE_QUESTIONS +
+                " WHERE " + COLUMN_QUESTIONS_QUIZ + "=" + QuizID;
+        try (Statement statement = conn.createStatement()) {
+            statement.execute(sql);
+            statement.execute(sql2);
+        } catch (SQLException e) {
+            System.out.println("Error deleting questions: " + e.getMessage());
+            return;
+        }
+    }
+
 
     public void queryQuizQuestion(String quizName){
         quizQuestions = new ArrayList<>();

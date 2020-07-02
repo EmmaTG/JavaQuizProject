@@ -12,15 +12,16 @@ public class CreateNewQuizStage {
     private Stage newStage;
     private Scene newScene;
     private String quizTitle;
+    private TextField quizNameTextField;
 
     public CreateNewQuizStage() {
     }
 
-    public Stage getNewStage() {
+    public Scene getNewScene() {
         newStage = new Stage();
 
         Label quizNameLabel = new Label("Quiz Name");
-        TextField quizNameTextField = new TextField();
+        quizNameTextField = new TextField();
         GridPane gridPane = new GridPane();
 
         gridPane.add(quizNameLabel, 0,0);
@@ -28,15 +29,12 @@ public class CreateNewQuizStage {
         gridPane.setStyle("-fx-padding: 30");
         gridPane.setVgap(20);
 
-        quizNameTextField.setOnAction(e -> {
-            setQuizTitle(quizNameTextField.getText());
-            newStage.close();
-        });
+//        quizNameTextFieldonAction();
 
-        newScene = new Scene(gridPane);
-        newStage.setTitle("Creating new quiz");
-        newStage.setScene(newScene);
-        return newStage;
+        return newScene = new Scene(gridPane);
+//        newStage.setTitle("Creating new quiz");
+//        newStage.setScene(newScene);
+//        return newStage;
     }
 
 
@@ -47,4 +45,15 @@ public class CreateNewQuizStage {
     public void setQuizTitle(String quizTitle) {
         this.quizTitle = quizTitle;
     }
+
+    public TextField getQuizNameTextField() {
+        return quizNameTextField;
+    }
+
+//    private void quizNameTextFieldonAction() {
+//        quizNameTextField.setOnAction(e -> {
+//            setQuizTitle(quizNameTextField.getText());
+//            newStage.close();
+//        });
+//    }
 }

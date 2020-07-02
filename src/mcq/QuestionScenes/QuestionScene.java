@@ -105,12 +105,12 @@ public class QuestionScene<T extends Question> {
         return imgHbox;
     }
 
-    public Stage getQuestionStage() {
-        newStage = new Stage();
+    public Scene getQuestionScene() {
+//        newStage = new Stage();
         newScene = new Scene(questionWindow);
-        newStage.setScene(newScene);
+//        newStage.setScene(newScene);
         newScene.getStylesheets().add(QuestionScene.class.getResource("QuestionScene.css").toExternalForm());
-        return newStage;
+        return newScene;
     }
 
     public ObservableList<Button> getPossibleAnswers() {

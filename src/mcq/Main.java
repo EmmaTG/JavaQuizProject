@@ -13,13 +13,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import mcq.Data.PreMadeQuizOptions;
 import mcq.Data.QuestionDataSource;
-import mcq.Data.SelectCategoryStage;
+import mcq.Data.SelectQuizList;
 import mcq.QuestionScenes.QuestionScene;
 import mcq.QuestionScenes.WriteInQuestionScene;
 import mcq.Questions.MultipleChoiceQuestion;
@@ -44,11 +41,7 @@ public class Main extends Application {
     public static boolean homeScreen;
     public static Stage typeOfQStage = new Stage();
 
-    enum questionType {
-        MCQ,
-        TF,
-        WI
-    }
+
 
 
     @Override
@@ -77,7 +70,8 @@ public class Main extends Application {
 //
 //        runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
 
-        homeScreen("Welcome!");
+        Stage newStage = new Stage();
+        homeScreen("Welcome!",newStage);
 
     }
 
@@ -95,7 +89,7 @@ public class Main extends Application {
         QuestionDataSource.getInstance().close();
     }
 
-    public static void homeScreen(String message) {
+    public static void homeScreen(String message, Stage stage) {
         windowClose = false;
         homeScreen = false;
 
@@ -105,15 +99,16 @@ public class Main extends Application {
         //1. Create a new quiz
         Button createQuizButton = openingScene.getCreateQuiz();
         createQuizButton.onActionProperty().setValue(event -> {
-            window.close();
-            createQuiz();
+//            stage.close();
+//            window.close();
+            createQuiz(window);
         });
 
         //2. Use an existing quiz from the database
         Button existingQuizButton = openingScene.getExistingQuiz();
         existingQuizButton.onActionProperty().setValue(e -> {
-            window.close();
-            selectQuiz();
+//            window.close();
+            selectQuiz(window);
         });
 
         //3. Quit Application
@@ -121,22 +116,25 @@ public class Main extends Application {
         quitQuizButton.onActionProperty().setValue(event -> {
             window.close();
         });
-
+//            stage.setScene(op);
         window.setScene(openingScene.getScene());
         window.show();
     }
 
-    private static void createQuiz(){
+    private static void createQuiz(Stage stage){
 
-        //1. Give new quiz a name
+        // Get scene for create quiz name
         CreateNewQuizStage nameQuiz = new CreateNewQuizStage();
-        Stage nameQuizStage = nameQuiz.getNewStage();
-        nameQuizStage.showAndWait();
+        Scene nameQuizStage = nameQuiz.getNewScene();
+        TextField quizNameTextField = nameQuiz.getQuizNameTextField();
+        quizNameTextField.setOnAction((e) -> {
+            nameQuiz.setQuizTitle(quizNameTextField.getText());
+            CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
+            Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(stage);
+            stage.setScene(createQuizQuestionsStage);
+        });
 
-        //2. Open create quiz stage
-        CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
-        Stage createQuizQuestionsStage = createQuizQuestions.getNewStage();
-        createQuizQuestionsStage.showAndWait();
+        stage.setScene(nameQuizStage);
     }
 
     public static ObservableList<QuestionScene> createQuestionScenes(List<Question> listOfQuestions) {
@@ -163,118 +161,41 @@ public class Main extends Application {
         return questionScenesObservList;
     }
 
-    private static boolean createQuestion(Quiz newQuiz, questionType type){
-        Dialog<? extends Question> dialog = null;
-        if (type == questionType.MCQ){
-            dialog = new MCQDialog().getDialog();
-        } else if ( type == questionType.TF){
-            dialog = new TrueFalseDialog().getDialog();
-        } else if (type == questionType.WI){
-            dialog= new WriteInDialog().getDialog();
-        }
-        if (dialog != null) {;
-            Optional<? extends Question> result1 = dialog.showAndWait();
-            if (result1.isPresent()) {
-                Question question = result1.get();
-                newQuiz.addQuestion(question);
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     private static void selectCategory(){
 
     }
 
-    private static void selectQuiz() {
+    private static void selectQuiz(Stage stage) {
+        Scene newScene;
 
-        Stage selectCategoryStage = SelectCategoryStage.getCategoryStage();
-        selectCategoryStage.showAndWait();
+        newScene = SelectQuizList.createScene();
 
-        Stage selectQuizStage = PreMadeQuizOptions.getNewStage();
-        selectQuizStage.showAndWait();
+        Button startButton = SelectQuizList.getStartButton();
+        startButton.setOnAction((e) -> {
+            stage.close();
+            QuestionDataSource.getInstance().queryQuizQuestion(SelectQuizList.getSelectedItem());
+            List<Question> selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
 
-        List<Question> selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
-
-        if (selectedQuizQuestions != null){
-        ObservableList<QuestionScene> questionScenes = createQuestionScenes(selectedQuizQuestions);
-        runQuiz(questionScenes);
-        }
-
-        homeScreen("");
-
-    }
-
-    public static void typeOfQuestionToCreate(Quiz newQuiz) {
-        IntegerProperty property = new SimpleIntegerProperty(newQuiz.getQuestions().size());
-        typeOfQStage = new Stage();
-        Label typeofQ = new Label("What type of question would you like to create?");
-        typeofQ.setWrapText(true);
-        Button mcqButton = new Button("Multiple Choice");
-        mcqButton.setMaxWidth(Double.MAX_VALUE);
-        Button tfButton = new Button("True/False");
-        tfButton.setMaxWidth(Double.MAX_VALUE);
-        Button wiButton = new Button("Write in Question");
-        wiButton.setMaxWidth(Double.MAX_VALUE);
-
-        Button doneButton = new Button("Done");
-        doneButton.setMaxWidth(Double.MAX_VALUE);
-        doneButton.disableProperty().bind(property.lessThan(1));
-
-        Button quitButton = new Button("Cancel");
-        quitButton.setMaxWidth(Double.MAX_VALUE);
-
-        Label numberOfQuestions = new Label();
-        numberOfQuestions.textProperty().bind(property.asString());
-        Label numberOfQuestions2 = new Label(" Questions created");
-
-        GridPane gridPane = new GridPane();
-        VBox vBox = new VBox(typeofQ, mcqButton, tfButton, wiButton, new HBox(quitButton, doneButton, numberOfQuestions, numberOfQuestions2));
-        gridPane.add(vBox, 0, 0);
-        gridPane.setVgap(20);
-        gridPane.setHgap(20);
-        gridPane.setStyle("-fx-padding: 50");
-
-        mcqButton.setOnAction(e -> {
-            if (createQuestion(newQuiz, questionType.MCQ)) {
-                property.set(property.get() + 1);
-            }
-        });
-        tfButton.setOnAction(e -> {
-            if (createQuestion(newQuiz, questionType.TF)) {
-                property.set(property.get() + 1);
-            }
-        });
-        wiButton.setOnAction(e -> {
-            if (createQuestion(newQuiz,questionType.WI)) {
-                property.set(property.get() + 1);
-            }
-        });
-        doneButton.setOnAction(e -> {
-            CreateQuizQuestionsStage.setObservableQuestionList(newQuiz.getQuestions());
-//            createQuestionScenes(newQuiz.getQuestions());
-            windowClose = true;
-            homeScreen = true;
-            typeOfQStage.close();
+            if (selectedQuizQuestions != null){
+                ObservableList<QuestionScene> questionScenes = createQuestionScenes(selectedQuizQuestions);
+                runQuiz(questionScenes);
+            };
         });
 
-        quitButton.setOnAction(e -> {
-            typeOfQStage.close();
-            windowClose = true;
-            homeScreen = true;
-        });
+        Button editButton = SelectQuizList.getEditButton();
+        editButton.setOnAction((e) -> {
+                    String selectedQuiz = SelectQuizList.getSelectedItem();
+                    QuestionDataSource.getInstance().queryQuizQuestion(selectedQuiz);
+                    List<Question> listOfQuestions = QuestionDataSource.getInstance().getQuizQuestions();
+                    CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(selectedQuiz,listOfQuestions);
+                    Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(stage);
+                    stage.setScene(createQuizQuestionsStage);
+                }
+                );
+        stage.setScene(newScene);
 
-
-        typeOfQStage.setOnCloseRequest(e -> {
-            windowClose = true;
-            homeScreen = true;
-        });
-
-        Scene typeOfQScene = new Scene(gridPane);
-        typeOfQStage.setScene(typeOfQScene);
-        typeOfQStage.setTitle("Type of question");
-        typeOfQStage.showAndWait();
     }
 
     private static HBox setProgressBar(int counter, int listOfQuestionScenes){
@@ -292,12 +213,11 @@ public class Main extends Application {
     public static void runQuiz(ObservableList<QuestionScene> listOfQuestionScenes) {
         windowClose = false;
         correctAnswers = 0;
-
         int count = 0;
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
 
-                Stage qsStage;
+                Stage qsStage = new Stage();
 
                 HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
                 count++;
@@ -305,12 +225,14 @@ public class Main extends Application {
                 qs.setPossibleAnswers();
                 ObservableList<Button> questionButtons = qs.getPossibleAnswers();
                 qs.setQuestionWindow(questionButtons, progressBar);
-                qsStage = qs.getQuestionStage();
+
+                qsStage.setScene(qs.getQuestionScene());
+
+                qsStage.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
 
                 qsStage.setOnCloseRequest(we -> {
                     windowClose = true;
                     homeScreen = true;
-
                 });
 
                 // Correct answer dialog
@@ -326,25 +248,21 @@ public class Main extends Application {
 
                 if (qs.getQuestion() instanceof MultipleChoiceQuestion || qs.getQuestion() instanceof TrueFalse) {
                     for (Button b : questionButtons) {
-                        if (b.getText().equalsIgnoreCase(qs.getQuestion().getCorrectAnswer())) {
-                            b.setOnAction(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent event) {
+                        b.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                if (b.getText().equalsIgnoreCase(qs.getQuestion().getCorrectAnswer())) {
                                     correctAlert.showAndWait();
                                     correctAnswers++;
                                     qsStage.close();
-                                }
-                            });
-                        } else {
-                            b.setOnAction(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent event) {
+
+                                } else {
                                     inCorrectAlert.setContentText("The answer is " + qs.getQuestion().getCorrectAnswer());
                                     inCorrectAlert.showAndWait();
                                     qsStage.close();
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 }
 
@@ -359,6 +277,7 @@ public class Main extends Application {
                                 correctAnswers++;
                                 qsStage.close();
                             } else {
+
                                 inCorrectAlert.setContentText("The answer is " + qs.getQuestion().getCorrectAnswer());
                                 inCorrectAlert.showAndWait();
                                 qsStage.close();
@@ -366,20 +285,21 @@ public class Main extends Application {
                         }
                     });
                 }
-
-                qsStage.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
-                qsStage.showAndWait();
+            qsStage.showAndWait();
+//                window.showAndWait();
             }
         }
 
         if (!windowClose) {
-            String s =String.format("Your Score: %d / %d \n \t %f \t %%", correctAnswers, listOfQuestionScenes.size(),
-                    Math.ceil(((double) correctAnswers / listOfQuestionScenes.size()) * 100));
+            String s =String.format("Your Score: %d / %d \n \t %d %%", correctAnswers, listOfQuestionScenes.size(),
+                    Math.round(((double) correctAnswers / listOfQuestionScenes.size()) * 100.00));
             resultsSummary(s);
 
         } else if (windowClose && homeScreen) {
-            homeScreen("");
+            homeScreen("",window);
         }
+
+
     }
 
     private static Alert createAlert(String headerText, String titleText, String imagePath){
@@ -416,7 +336,7 @@ public class Main extends Application {
         if (result.isPresent()) {
             if (result.get().getText().equalsIgnoreCase("Start a new quiz")) {
                 finalAlert.close();
-                homeScreen("");
+                homeScreen("",window);
             } else {
                 Platform.exit();
             }
