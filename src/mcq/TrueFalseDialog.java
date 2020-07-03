@@ -16,8 +16,6 @@ public class TrueFalseDialog {
     private Label label1 = new Label("Question: ");
     private Label label2 = new Label("Answer: ");
     private TextField questionTextField = new TextField();
-    //    private  ToggleButton trueToggle = new ToggleButton("True");
-//    private  ToggleButton falseToggle = new ToggleButton("False");
     private RadioButton trueToggle = new RadioButton("True");
     private RadioButton falseToggle = new RadioButton("False");
     private ButtonType okButton = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);

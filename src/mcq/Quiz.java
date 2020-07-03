@@ -14,6 +14,10 @@ public class Quiz {
         this.name = name;
         this.questions = new ArrayList<>();
     }
+    public Quiz(String name, List<Question> questionsList) {
+        this.name = name;
+        this.questions = questionsList;
+    }
 
     public <T extends Question> int addQuestion(T question){
         this.questions.add(question);

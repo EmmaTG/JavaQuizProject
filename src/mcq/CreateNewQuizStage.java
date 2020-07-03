@@ -29,12 +29,7 @@ public class CreateNewQuizStage {
         gridPane.setStyle("-fx-padding: 30");
         gridPane.setVgap(20);
 
-//        quizNameTextFieldonAction();
-
         return newScene = new Scene(gridPane);
-//        newStage.setTitle("Creating new quiz");
-//        newStage.setScene(newScene);
-//        return newStage;
     }
 
 
@@ -50,10 +45,4 @@ public class CreateNewQuizStage {
         return quizNameTextField;
     }
 
-//    private void quizNameTextFieldonAction() {
-//        quizNameTextField.setOnAction(e -> {
-//            setQuizTitle(quizNameTextField.getText());
-//            newStage.close();
-//        });
-//    }
 }
