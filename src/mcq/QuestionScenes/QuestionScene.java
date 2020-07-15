@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -14,6 +15,8 @@ import javafx.stage.Stage;
 import mcq.Questions.MultipleChoiceQuestion;
 import mcq.Questions.Question;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +72,7 @@ public class QuestionScene<T extends Question> {
                 hboxes.add(answerOptions);
             }
         }
+
         VBox optionsVBox = questionHeading(question,questionNumber);
 
         for (HBox hBox: hboxes) {
@@ -77,18 +81,18 @@ public class QuestionScene<T extends Question> {
         optionsVBox.setAlignment(Pos.CENTER);
         optionsVBox.setSpacing(10);
 
-        setQuestionWindow(question, optionsVBox, progressHBox);
+        setFullQuestionWindow(question, optionsVBox, progressHBox);
 
     }
 
-    public void setQuestionWindow(Question question, VBox vbox, HBox hbox){
+    public void setFullQuestionWindow(Question question, VBox vbox, HBox hbox){
         questionWindow = new GridPane();
         questionWindow.setVgap(10);
-        if (question.getQuestionImage() != null){
+        if (!question.getQuestionImagePath().equalsIgnoreCase("")){
             HBox imageView = getImage();
-            questionWindow.add(imageView, 0, 0);
-            questionWindow.add(vbox, 0,1);
-            questionWindow.add(hbox, 0, 2);
+            questionWindow.add(imageView, 0, 1);
+            questionWindow.add(vbox, 0,2);
+            questionWindow.add(hbox, 0, 3);
             return;
         }
 
@@ -96,13 +100,20 @@ public class QuestionScene<T extends Question> {
         questionWindow.add(hbox, 0, 1);
     }
 
-    private HBox  getImage(){
-        ImageView imageView = new ImageView(question.getQuestionImage());
-        imageView.setFitWidth( sceneWidth-100);
-        imageView.setPreserveRatio(true);
-        HBox imgHbox = new HBox(imageView);
-        imgHbox.setAlignment(Pos.CENTER);
-        return imgHbox;
+    private HBox getImage(){
+        try {
+            System.out.println(question.getQuestionImagePath());
+            Image image = new Image(new FileInputStream(question.getQuestionImagePath()));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth( sceneWidth-100);
+            imageView.setPreserveRatio(true);
+            HBox imgHbox = new HBox(imageView);
+            imgHbox.setAlignment(Pos.CENTER);
+            return imgHbox;
+        } catch (IOException e) {
+            System.out.println("File not found: " + e.getMessage());
+            return new HBox();
+        }
     }
 
     public Scene getQuestionScene() {

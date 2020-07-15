@@ -126,17 +126,33 @@ public class Main extends Application {
         // Get scene for create quiz name
         CreateNewQuizStage nameQuiz = new CreateNewQuizStage();
         Scene nameQuizStage = nameQuiz.getNewScene();
+        nameQuiz.getBackButton().setOnAction((e2) -> homeScreen("", stage));
         TextField quizNameTextField = nameQuiz.getQuizNameTextField();
-        quizNameTextField.setOnAction((e) -> {
-            nameQuiz.setQuizTitle(quizNameTextField.getText());
-            CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
-            createQuizQuestions.getCancel().setOnAction((e1) ->{
-                homeScreen("",stage);
-            });
-            Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(stage);
-            stage.setScene(createQuizQuestionsStage);
-            stage.setTitle(nameQuiz.getQuizTitle());
-        });
+        EventHandler<ActionEvent> continueEvent = (e) -> {
+            String quizTitle = quizNameTextField.getText();
+            if (!quizNameTextField.getText().isEmpty() && !quizNameTextField.getText().trim().isEmpty()) {
+                if (QuestionDataSource.getInstance().quizNameExists(quizTitle)) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "This quiz name already exists. \nPlease try another name");
+                    alert.show();
+                } else {
+                    nameQuiz.setQuizTitle(quizNameTextField.getText());
+
+                    CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
+                    createQuizQuestions.getCancel().setOnAction((e1) -> {
+                        homeScreen("", stage);
+                    });
+                    Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(stage);
+                    stage.setScene(createQuizQuestionsStage);
+                    stage.setTitle(nameQuiz.getQuizTitle());
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Please enter a quiz name");
+                alert.show();
+            }
+        };
+
+        nameQuiz.getOkButton().setOnAction(continueEvent);
+        quizNameTextField.setOnAction(continueEvent);
 
         stage.setOnCloseRequest((e1) -> {
             homeScreen("Welcome", stage);

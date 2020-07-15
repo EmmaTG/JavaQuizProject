@@ -14,13 +14,13 @@ public class MultipleChoiceQuestion extends Question {
         super(question, correctAnswer, time);
         this.options = FXCollections.observableArrayList(options);
     }
-    public MultipleChoiceQuestion(String question, String correctAnswer, int time, List<String> options, Image questionImage) {
-        super(question, correctAnswer, time,questionImage);
+    public MultipleChoiceQuestion(String question, String correctAnswer, int time, List<String> options, String imagePath, Image questionImage) {
+        super(question, correctAnswer, time,imagePath, questionImage);
         this.options = FXCollections.observableArrayList(options);
     }
 
-    public MultipleChoiceQuestion(String question, String correctAnswer, List<String> options, Image questionImage) {
-        super(question, correctAnswer,questionImage);
+    public MultipleChoiceQuestion(String question, String correctAnswer, List<String> options, String imagePath, Image questionImage) {
+        super(question, correctAnswer,imagePath, questionImage);
         this.options = FXCollections.observableArrayList(options);
 
     }

@@ -26,7 +26,7 @@ public class WriteInQuestionScene extends QuestionScene {
 
         optionsVBox.setSpacing(10);
 
-        setQuestionWindow(question,optionsVBox,progressHBox);
+        setFullQuestionWindow(question,optionsVBox,progressHBox);
     }
 
     public TextField getAnswerField() {

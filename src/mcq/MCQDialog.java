@@ -26,7 +26,7 @@ public class MCQDialog {
     private  ButtonType okButton = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
     private  ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
     private Label includeImage = new Label("Image");
-    private CheckBox imagecheck = new CheckBox();
+    private CheckBox imageCheck = new CheckBox();
     private TextField filePath = new TextField();
 
     public MCQDialog() {
@@ -72,10 +72,10 @@ public class MCQDialog {
         gridPane.add(falseAnswerTextField2, 0, 6);
         gridPane.add(falseAnswerTextField3, 0, 7);
         gridPane.add(new Label(" "),0,8);
-        HBox imageHbox = new HBox(includeImage,imagecheck);
+        HBox imageHbox = new HBox(includeImage, imageCheck);
         imageHbox.setSpacing(20);
-        imagecheck.setOnAction( e ->{
-            if (imagecheck.isSelected()){
+        imageCheck.setOnAction(e ->{
+            if (imageCheck.isSelected()){
             gridPane.add(filePath, 0, 10);
             dialog.setHeight(dialog.getHeight()+30);
         }
@@ -122,11 +122,12 @@ public class MCQDialog {
                             falseAnswerTextField2.getText(),
                             falseAnswerTextField3.getText());
                     dialog.getDialogPane().lookupButton(okButton).setDisable(true);
-                    if (imagecheck.isSelected() && !filePath.getText().trim().isEmpty()){
+                    if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()){
                         try{
-                            Image image = new Image(new FileInputStream(filePath.getText()));
+                            String filePathString = filePath.getText();
+                            Image image = new Image(new FileInputStream(filePathString));
                             clearFields();
-                            return new MultipleChoiceQuestion(questionText,answerText, answerOptions,image);
+                            return new MultipleChoiceQuestion(questionText,answerText, answerOptions, filePathString, image);
                         } catch (IOException e){
                             System.out.println("Error: Could not find image - " + e.getMessage());
                             return new MultipleChoiceQuestion(questionText,answerText, answerOptions);
@@ -146,7 +147,7 @@ public class MCQDialog {
         falseAnswerTextField1.clear();
         falseAnswerTextField2.clear();
         falseAnswerTextField3.clear();
-        imagecheck.setSelected(false);
+        imageCheck.setSelected(false);
         filePath.clear();
 
     }

@@ -13,11 +13,11 @@ public class TrueFalse extends MultipleChoiceQuestion {
         super(question, correctAnswer, Arrays.asList("True","False"));
     }
 
-    public TrueFalse(String question, String correctAnswer, int time,  Image questionImage) {
-        super(question, correctAnswer, time, Arrays.asList("True","False"),questionImage);
+    public TrueFalse(String question, String correctAnswer, int time, String imagePath,  Image questionImage) {
+        super(question, correctAnswer, time, Arrays.asList("True","False"),imagePath, questionImage);
     }
 
-    public TrueFalse(String question, String correctAnswer,  Image questionImage) {
-        super(question, correctAnswer, Arrays.asList("True","False"),questionImage);
+    public TrueFalse(String question, String correctAnswer, String imagePath,  Image questionImage) {
+        super(question, correctAnswer, Arrays.asList("True","False"),imagePath, questionImage);
     }
 }

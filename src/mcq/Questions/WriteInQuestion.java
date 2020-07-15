@@ -13,12 +13,12 @@ public class WriteInQuestion extends Question {
         super(question, correctAnswer);
     }
 
-    public WriteInQuestion(String question, String correctAnswer, int time, Image questionImage) {
-        super(question, correctAnswer, time,questionImage);
+    public WriteInQuestion(String question, String correctAnswer, int time,String imagePath, Image questionImage) {
+        super(question, correctAnswer, time,imagePath,questionImage);
     }
 
-    public WriteInQuestion(String question, String correctAnswer, Image questionImage) {
-        super(question, correctAnswer,questionImage);
+    public WriteInQuestion(String question, String correctAnswer, String imagePath, Image questionImage) {
+        super(question, correctAnswer,imagePath, questionImage);
     }
 
     @Override

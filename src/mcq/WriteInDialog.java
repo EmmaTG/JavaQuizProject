@@ -86,8 +86,10 @@ public class WriteInDialog {
                 if (param == okButton) {
                     if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()) {
                         try {
-                            Image image = new Image(new FileInputStream(filePath.getText()));
-                            return new WriteInQuestion(questionTextField.getText(), answerTextField.getText(), image);
+                            String filePathString = filePath.getText();
+                            Image image = new Image(new FileInputStream(filePathString));
+                            filePath.clear();
+                            return new WriteInQuestion(questionTextField.getText(), answerTextField.getText(), filePathString, image);
                         } catch (IOException e) {
                             System.out.println("Error: Could not find image - " + e.getMessage());
                             return new WriteInQuestion(questionTextField.getText(), answerTextField.getText());

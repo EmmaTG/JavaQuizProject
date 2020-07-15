@@ -109,8 +109,10 @@ public class TrueFalseDialog {
         TrueFalse newTFQ;
         if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()) {
             try {
-                Image image = new Image(new FileInputStream(filePath.getText()));
-                return new TrueFalse(questionTextField.getText(), correctAnswer, image);
+                String filePathString = filePath.getText();
+                Image image = new Image(new FileInputStream(filePathString));
+                filePath.clear();
+                return new TrueFalse(questionTextField.getText(), correctAnswer, filePathString, image);
             } catch (IOException e) {
                 System.out.println("Error: Could not find image - " + e.getMessage());
                 return new TrueFalse(questionTextField.getText(), correctAnswer);

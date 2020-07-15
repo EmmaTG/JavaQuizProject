@@ -9,12 +9,14 @@ public abstract class Question {
     private final String correctAnswer;
     private final int time;
     private final Image questionImage;
+    private final String questionImagePath;
 
-    public Question(String question, String correctAnswer, int time, Image questionImage) {
+    public Question(String question, String correctAnswer, int time, String imagePath, Image image) {
         this.question = question;
         this.correctAnswer = correctAnswer;
         this.time = time;
-        this.questionImage = questionImage;
+        this.questionImagePath = imagePath;
+        this.questionImage =  image;
     }
 
     public Question(String question, String correctAnswer, int time) {
@@ -22,13 +24,15 @@ public abstract class Question {
         this.correctAnswer = correctAnswer;
         this.time = time;
         this.questionImage = null;
+        this.questionImagePath = "";
     }
 
-    public Question(String question, String correctAnswer, Image questionImage) {
+    public Question(String question, String correctAnswer, String imagePath, Image questionImage) {
         this.question = question;
         this.correctAnswer = correctAnswer;
         this.time = 30;
         this.questionImage = questionImage;
+        this.questionImagePath = imagePath;
     }
 
     public Question(String question, String correctAnswer) {
@@ -36,6 +40,7 @@ public abstract class Question {
         this.correctAnswer = correctAnswer;
         this.time = 30;
         this.questionImage = null;
+        this.questionImagePath = "";
     }
 
     public boolean isCorrect(String answer){
@@ -74,6 +79,11 @@ public abstract class Question {
     public Image getQuestionImage() {
         return questionImage;
     }
+
+    public String getQuestionImagePath() {
+        return questionImagePath;
+    }
+
 
     public abstract ObservableList<String> getOptions();
 
