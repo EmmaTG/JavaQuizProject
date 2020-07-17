@@ -133,22 +133,30 @@ public class QuestionDataSource {
     }
 
     public void deleteQuiz(String quizName) {
+        deleteQuestions(quizName);
+        String sql = "DELETE FROM " + TABLE_QUIZ +
+                " WHERE " + COLUMN_QUIZ_NAME + "=\"" + quizName + "\"";
+        try (Statement statement = conn.createStatement()) {
+            statement.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Error deleting quiz: " + e.getMessage());
+        }
+    }
+    private void deleteQuestions(String quizName){
         int QuizID = queryQuizID(quizName);
         if (QuizID == -1) {
             System.out.println("Error getting quiz _id");
             return;
         }
-        String sql = "DELETE FROM " + TABLE_QUIZ +
-                " WHERE " + COLUMN_QUIZ_NAME + "=\"" + quizName + "\"";
         String sql2 = "DELETE FROM " + TABLE_QUESTIONS +
                 " WHERE " + COLUMN_QUESTIONS_QUIZ + "=" + QuizID;
+
         try (Statement statement = conn.createStatement()) {
-            statement.execute(sql);
             statement.execute(sql2);
         } catch (SQLException e) {
             System.out.println("Error deleting questions: " + e.getMessage());
-            return;
         }
+
     }
 
 
@@ -166,6 +174,7 @@ public class QuestionDataSource {
             ResultSet results = statement.executeQuery(sql)){
             while(results.next()){
             int questiontype = results.getInt(COLUMN_QUESTIONS_TYPE);
+            Question newQ;
             if (questiontype ==MCQ){
                 //MCQ question
                 String title = results.getString(COLUMN_QUESTIONS_TITLE);
@@ -179,35 +188,55 @@ public class QuestionDataSource {
                 listOfAnswers.add(option1);
                 listOfAnswers.add(option2);
                 listOfAnswers.add(option3);
-                MultipleChoiceQuestion mcq;
                 if (imagePath == null) {
-                    mcq = new MultipleChoiceQuestion(title, answer, listOfAnswers);
+                    newQ = new MultipleChoiceQuestion(title, answer, listOfAnswers);
                 } else {
                     try {
                         Image image = new Image(new FileInputStream(imagePath));
-                        mcq = new MultipleChoiceQuestion(title, answer, listOfAnswers,imagePath,image);
+                        newQ = new MultipleChoiceQuestion(title, answer, listOfAnswers,imagePath,image);
                     } catch (IOException e){
                         System.out.println("File Not Found: " + e.getMessage());
-                        mcq = new MultipleChoiceQuestion(title, answer, listOfAnswers);
+                        newQ = new MultipleChoiceQuestion(title, answer, listOfAnswers);
                     }
                 }
-                quizQuestions.add(mcq);
             }
-            if (questiontype ==TF){
+            else if (questiontype ==TF){
                 // True/False Question
                 String title = results.getString(COLUMN_QUESTIONS_TITLE);
                 String answer = results.getString(COLUMN_QUESTIONS_ANSWER);
-                TrueFalse tfq = new TrueFalse(title,answer);
-                quizQuestions.add(tfq);
-
+                String imagePath = results.getString(COLUMN_QUESTIONS_IMAGES);
+                if (imagePath == null) {
+                    newQ = new TrueFalse(title, answer);
+                } else {
+                    try {
+                        Image image = new Image(new FileInputStream(imagePath));
+                        newQ = new TrueFalse(title, answer,imagePath,image);
+                    } catch (IOException e){
+                        System.out.println("File Not Found: " + e.getMessage());
+                        newQ = new TrueFalse(title, answer);
+                    }
+                }
             }
-            if (questiontype ==WI){
+            else if (questiontype ==WI){
                 // Write in question
                 String title = results.getString(COLUMN_QUESTIONS_TITLE);
                 String answer = results.getString(COLUMN_QUESTIONS_ANSWER);
-                WriteInQuestion wiq = new WriteInQuestion(title,answer);
-                quizQuestions.add(wiq);
-            }
+                String imagePath = results.getString(COLUMN_QUESTIONS_IMAGES);
+                if (imagePath == null) {
+                    newQ = new WriteInQuestion(title, answer);
+                } else {
+                    try {
+                        Image image = new Image(new FileInputStream(imagePath));
+                        newQ = new WriteInQuestion(title, answer,imagePath,image);
+                    } catch (IOException e){
+                        System.out.println("File Not Found: " + e.getMessage());
+                        newQ = new WriteInQuestion(title, answer);
+                    }
+                }
+            } else {
+                return;
+                }
+            quizQuestions.add(newQ);
             }
         } catch (SQLException e){
             System.out.println("Error getting questions: " + e.getMessage());
@@ -269,72 +298,112 @@ public class QuestionDataSource {
         return quizzesInDatabase;
     }
 
+//    public void saveEditedQuiz(Quiz edittedQuiz){
+//        int quizID = queryQuizID(edittedQuiz.getName());
+//        String sqlUpdate1 = "UPDATE " + TABLE_QUESTIONS + " SET " +
+//                COLUMCOLUMN_QUESTIONS_OPTION1 + "=" +
+//                COLUMN_QUESTIONS_OPTION2 + "=" +
+//                COLUMN_QUESTIONS_OPTION3 + "=" +;
+//        String sqlUpdate2 = "UPDATE " + TABLE_QUESTIONS + " SET " +
+//                COLUMN_QUESTIONS_OPTION1 + "=" +
+//                COLUMN_QUESTIONS_OPTION2 + "=" +
+//                COLUMN_QUESTIONS_OPTION3 + "=" +;
+//        for (Question question : edittedQuiz.getQuestions()) {
+//            String title = question.getQuestion();
+//            String answer = question.getCorrectAnswer();
+//            if (question instanceof TrueFalse || question instanceof WriteInQuestion) {
+//                int type;
+//                if (question instanceof WriteInQuestion) {
+//                    type = WI;
+//                } else {
+//                    type = TF;
+//                }
+//                try (Statement statement = conn.createStatement()) {
+//                    statement.execute(sqlUpdate1);
+//                } catch (SQLException e) {
+//
+//                }
+//
+//            } else if (question instanceof MultipleChoiceQuestion) {
+//                List<String> options = question.getOptions();
+//                try (Statement statement = conn.createStatement();) {
+//                    statement.execute(sqlUpdate2);
+//                } catch (SQLException e) {
+//
+//                }
+//            }
+//        }
+//    }
+
     public void saveNewQuiz(Quiz newQuiz){
-        int quizID =-1;
-        try {
-            saveQuizPrep.setString(1,newQuiz.getName());
-            saveQuizPrep.execute();
-            quizID = queryQuizID(newQuiz.getName());
-        } catch (SQLException e){
-            System.out.println("SQL Error creating quiz: " + newQuiz.getName() );
-            System.out.println(e.getMessage());
-        }
-
-        for (Question question : newQuiz.getQuestions()){
-            String title = question.getQuestion();
-            String answer = question.getCorrectAnswer();
-            if (question instanceof TrueFalse || question instanceof WriteInQuestion){
-                int type;
-                if (question instanceof WriteInQuestion){
-                    type = WI;
-                } else{
-                    type = TF;
-                }
-                try {
-                    saveQuestionInsertPrep1.setString(1, title);
-                    saveQuestionInsertPrep1.setInt(2, type);
-                    saveQuestionInsertPrep1.setString(3, answer);
-                    saveQuestionInsertPrep1.setInt(4, quizID);
-                    if (!question.getQuestionImagePath().isEmpty()){
-                        saveQuestionInsertPrep1.setString(5,question.getQuestionImagePath());
-                    } else {
-                        saveQuestionInsertPrep1.setString(5, null);
-                    }
-                    saveQuestionInsertPrep1.execute();
-                } catch (SQLException e){
-                    System.out.println("SQL Error adding question titled: " + question.getQuestion());
-                    System.out.println(e.getMessage());
-                }
+        int quizID;
+        // Check to see if the quiz is new or has just been edited
+        if (!quizNameExists(newQuiz.getName())) {   // New quiz needs to e created in database quiz table
+            try {
+                saveQuizPrep.setString(1, newQuiz.getName());
+                saveQuizPrep.execute();
+            } catch (SQLException e) {
+                System.out.println("SQL Error creating quiz: " + newQuiz.getName());
+                System.out.println(e.getMessage());
             }
-            else if (question instanceof MultipleChoiceQuestion){
-                List<String> options = question.getOptions();
-                try {
-                    saveQuestionInsertPrep2.setString(1,title);
-                    saveQuestionInsertPrep2.setInt(2,MCQ);
-                    saveQuestionInsertPrep2.setString(3,answer);
-                    saveQuestionInsertPrep2.setString(4,options.get(1));
-                    saveQuestionInsertPrep2.setString(5,options.get(2));
-                    saveQuestionInsertPrep2.setString(6,options.get(3));
-                    saveQuestionInsertPrep2.setInt(7,quizID);
-                    System.out.println(question.getQuestionImagePath());
-                    if (!question.getQuestionImagePath().equalsIgnoreCase("")){
-                        saveQuestionInsertPrep2.setString(8,question.getQuestionImagePath());
+        } else {    // Quiz questions will be updated so previous questions must be deleted
+            deleteQuestions(newQuiz.getName());
+        }
+        quizID = queryQuizID(newQuiz.getName());
+            for (Question question : newQuiz.getQuestions()) {
+                String title = question.getQuestion();
+                String answer = question.getCorrectAnswer();
+                if (question instanceof TrueFalse || question instanceof WriteInQuestion) {
+                    int type;
+                    if (question instanceof WriteInQuestion) {
+                        type = WI;
                     } else {
-                        saveQuestionInsertPrep2.setString(8, null);
+                        type = TF;
                     }
-                    saveQuestionInsertPrep2.execute();
-                } catch (SQLException e){
-                    System.out.println("SQL Error adding question titled: " + question.getQuestion());
-                    System.out.println(e.getMessage());
+                    try {
+                        saveQuestionInsertPrep1.setString(1, title);
+                        saveQuestionInsertPrep1.setInt(2, type);
+                        saveQuestionInsertPrep1.setString(3, answer);
+                        saveQuestionInsertPrep1.setInt(4, quizID);
+                        if (!question.getQuestionImagePath().isEmpty()) {
+                            saveQuestionInsertPrep1.setString(5, question.getQuestionImagePath());
+                        } else {
+                            saveQuestionInsertPrep1.setString(5, null);
+                        }
+                        saveQuestionInsertPrep1.execute();
+                    } catch (SQLException e) {
+                        System.out.println("SQL Error adding question titled: " + question.getQuestion());
+                        System.out.println(e.getMessage());
+                    }
+                } else if (question instanceof MultipleChoiceQuestion) {
+                    List<String> options = question.getOptions();
+                    try {
+                        saveQuestionInsertPrep2.setString(1, title);
+                        saveQuestionInsertPrep2.setInt(2, MCQ);
+                        saveQuestionInsertPrep2.setString(3, answer);
+                        saveQuestionInsertPrep2.setString(4, options.get(1));
+                        saveQuestionInsertPrep2.setString(5, options.get(2));
+                        saveQuestionInsertPrep2.setString(6, options.get(3));
+                        saveQuestionInsertPrep2.setInt(7, quizID);
+                        if (!question.getQuestionImagePath().equalsIgnoreCase("")) {
+                            saveQuestionInsertPrep2.setString(8, question.getQuestionImagePath());
+                        } else {
+                            saveQuestionInsertPrep2.setString(8, null);
+                        }
+                        saveQuestionInsertPrep2.execute();
+                    } catch (SQLException e) {
+                        System.out.println("SQL Error adding question titled: " + question.getQuestion());
+                        System.out.println(e.getMessage());
+                    }
+
+                } else {
+                    System.out.println("Error unknown type of question");
+                    return;
                 }
 
-            } else {
-                System.out.println("Error unknown type of question");
-                return;
             }
-
-        }
     }
+
 
     public List<String> getCategories(){
         String getCategories = "SELECT (" + TABLE_CATEGORIES + "." + COLUMN_CATEGORIES_NAME +

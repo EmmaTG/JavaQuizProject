@@ -10,7 +10,7 @@ import mcq.Questions.TrueFalse;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class TrueFalseDialog {
+public class TrueFalseDialog{
 
     private Dialog<TrueFalse> dialog;
     private Label label1 = new Label("Question: ");
@@ -23,14 +23,12 @@ public class TrueFalseDialog {
     private Label includeImage = new Label("Image");
     private CheckBox imageCheck = new CheckBox();
     private TextField filePath = new TextField();
+    private GridPane gridPane = new GridPane();
 
     public TrueFalseDialog() {
-        this.dialog = new Dialog<>();
+        dialog = new Dialog<>();
     }
 
-    public TextField getQuestionTextField() {
-        return questionTextField;
-    }
 
     public RadioButton getTrueToggle() {
         return trueToggle;
@@ -40,12 +38,7 @@ public class TrueFalseDialog {
         return falseToggle;
     }
 
-    public ButtonType getOkButton() {
-        return okButton;
-    }
-
-    private void createDialogBox() {
-        GridPane gridPane = new GridPane();
+    public void createDialogBox() {
 
         dialog.setTitle("New Question");
         dialog.setResizable(true);
@@ -75,7 +68,8 @@ public class TrueFalseDialog {
         onActionDialogBox(gridPane);
     }
 
-    private void onActionDialogBox(GridPane gridPane) {
+
+    public void onActionDialogBox(GridPane gridPane) {
 
         dialog.getDialogPane().setContent(gridPane);
         dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
@@ -124,21 +118,44 @@ public class TrueFalseDialog {
         return newTFQ;
     }
 
-    private void clearFields() {
+    public void clearFields() {
+
         questionTextField.clear();
+        imageCheck.setSelected(false);
+        filePath.clear();
         trueToggle.setSelected(false);
         falseToggle.setSelected(false);
     }
 
-    public Dialog<TrueFalse> getDialog() {
+    public void okayButtonRelease() {
+        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                (!trueToggle.isSelected() && !falseToggle.isSelected());
+        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
+    }
+
+    public  Dialog<TrueFalse> getDialog() {
         createDialogBox();
         return dialog;
     }
 
 
-    private void okayButtonRelease() {
-        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
-                (!trueToggle.isSelected() && !falseToggle.isSelected());
-        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
+    public TextField getQuestionTextField() {
+        return questionTextField;
+    }
+
+    public CheckBox getImageCheck() {
+        return imageCheck;
+    }
+
+    public TextField getFilePath() {
+        return filePath;
+    }
+
+    public GridPane getGridPane() {
+        return gridPane;
+    }
+
+    public ButtonType getOkButton() {
+        return okButton;
     }
 }

@@ -22,27 +22,15 @@ public class WriteInDialog {
     private Label includeImage = new Label("Image");
     private CheckBox imageCheck = new CheckBox();
     private TextField filePath = new TextField();
+    private GridPane gridPane = new GridPane();
 
 
     public WriteInDialog() {
         this.dialog = new Dialog<>();
     }
 
-    public TextField getQuestionTextField() {
-        return questionTextField;
-    }
 
-    public TextField getAnswerTextField() {
-        return answerTextField;
-    }
-
-    public ButtonType getOkButton() {
-        return okButton;
-    }
-
-    private  void createDialogBox() {
-        GridPane gridPane = new GridPane();
-
+    public void createDialogBox() {
         dialog.setTitle("New Question");
         dialog.setResizable(true);
 
@@ -66,11 +54,11 @@ public class WriteInDialog {
         gridPane.add(imageHbox,0,9);
         gridPane.setStyle("-fx-padding: 10");
 
-
         onActionDialogBox(gridPane);
     }
 
-    private  void onActionDialogBox(GridPane gridPane) {
+
+    public void onActionDialogBox(GridPane gridPane) {
 
         dialog.getDialogPane().setContent(gridPane);
         dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
@@ -107,19 +95,47 @@ public class WriteInDialog {
 
     }
 
-    private void clearFields(){
+
+    public void clearFields() {
         questionTextField.clear();
+        imageCheck.setSelected(false);
+        filePath.clear();
         answerTextField.clear();
+    }
+
+    public void okayButtonRelease(){
+        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty();
+        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
     }
 
     public  Dialog<WriteInQuestion> getDialog() {
         createDialogBox();
         return dialog;
     }
-    private  void okayButtonRelease(){
-        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
-                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty();
-        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
+
+    public TextField getQuestionTextField() {
+        return questionTextField;
+    }
+
+    public TextField getAnswerTextField() {
+        return answerTextField;
+    }
+
+    public CheckBox getImageCheck() {
+        return imageCheck;
+    }
+
+    public TextField getFilePath() {
+        return filePath;
+    }
+
+    public GridPane getGridPane() {
+        return gridPane;
+    }
+
+    public ButtonType getOkButton() {
+        return okButton;
     }
 }
 

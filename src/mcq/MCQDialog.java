@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class MCQDialog {
+public class MCQDialog{
 
     private  Dialog<MultipleChoiceQuestion> dialog;
     private  Label label1 = new Label("Question: ");
@@ -28,17 +28,10 @@ public class MCQDialog {
     private Label includeImage = new Label("Image");
     private CheckBox imageCheck = new CheckBox();
     private TextField filePath = new TextField();
+    private GridPane gridPane = new GridPane();
 
     public MCQDialog() {
-        this.dialog = new Dialog<>();
-    }
-
-    public TextField getQuestionTextField() {
-        return questionTextField;
-    }
-
-    public TextField getAnswerTextField() {
-        return answerTextField;
+        dialog = new Dialog<>();
     }
 
     public TextField getFalseAnswerTextField1() {
@@ -53,12 +46,12 @@ public class MCQDialog {
         return falseAnswerTextField3;
     }
 
-    public ButtonType getOkButton() {
-        return okButton;
-    }
+//    public ButtonType getOkButton() {
+//        return okButton;
+//    }
 
-    private  void createDialogBox() {
-        GridPane gridPane = new GridPane();
+
+    public  void createDialogBox() {
 
         dialog.setTitle("New Question");
         dialog.setResizable(true);
@@ -91,7 +84,7 @@ public class MCQDialog {
     }
 
 
-    private  void onActionDialogBox(GridPane gridPane) {
+    public  void onActionDialogBox(GridPane gridPane) {
 
         dialog.getDialogPane().setContent(gridPane);
         dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
@@ -141,14 +134,26 @@ public class MCQDialog {
             }
         });
     }
-    private void clearFields(){
+
+
+    public void clearFields(){
         questionTextField.clear();
+        imageCheck.setSelected(false);
+        filePath.clear();
         answerTextField.clear();
         falseAnswerTextField1.clear();
         falseAnswerTextField2.clear();
         falseAnswerTextField3.clear();
-        imageCheck.setSelected(false);
-        filePath.clear();
+
+    }
+
+    public  void okayButtonRelease(){
+        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
+                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty() ||
+                falseAnswerTextField1.getText().isEmpty() || falseAnswerTextField1.getText().trim().isEmpty() ||
+                falseAnswerTextField2.getText().isEmpty() || falseAnswerTextField2.getText().trim().isEmpty() ||
+                falseAnswerTextField3.getText().isEmpty() || falseAnswerTextField3.getText().trim().isEmpty();
+        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
 
     }
 
@@ -157,13 +162,28 @@ public class MCQDialog {
         return dialog;
     }
 
-    private  void okayButtonRelease(){
-        boolean disableButton = questionTextField.getText().isEmpty() || questionTextField.getText().trim().isEmpty() ||
-                answerTextField.getText().isEmpty() || answerTextField.getText().trim().isEmpty() ||
-                falseAnswerTextField1.getText().isEmpty() || falseAnswerTextField1.getText().trim().isEmpty() ||
-                falseAnswerTextField2.getText().isEmpty() || falseAnswerTextField2.getText().trim().isEmpty() ||
-                falseAnswerTextField3.getText().isEmpty() || falseAnswerTextField3.getText().trim().isEmpty();
-        dialog.getDialogPane().lookupButton(okButton).setDisable(disableButton);
 
+    public TextField getQuestionTextField() {
+        return questionTextField;
+    }
+
+    public TextField getAnswerTextField() {
+        return answerTextField;
+    }
+
+    public CheckBox getImageCheck() {
+        return imageCheck;
+    }
+
+    public TextField getFilePath() {
+        return filePath;
+    }
+
+    public GridPane getGridPane() {
+        return gridPane;
+    }
+
+    public ButtonType getOkButton() {
+        return okButton;
     }
 }

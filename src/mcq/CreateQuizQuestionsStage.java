@@ -121,14 +121,18 @@ public class CreateQuizQuestionsStage {
 
         cancel.setMaxWidth(Double.MAX_VALUE);
 
-        vBox.getChildren().setAll(FXCollections.observableArrayList(newQuestion,editButton,deleteButton,playQuiz,saveQuiz,cancel));
-        vBox.setAlignment(Pos.CENTER);
-        vBox.setSpacing(10);
-
         borderPane.setCenter(listView);
         borderPane.setRight(vBox);
         newScene = new Scene(borderPane);
         return newScene;
+    }
+
+    public void setvBox(ObservableList<Button> buttons) {
+        VBox buttonBox  = new VBox();
+        buttonBox.getChildren().setAll(buttons);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setSpacing(10);
+        this.vBox = buttonBox;
     }
 
     public Button getNewQuestion() {
@@ -183,8 +187,8 @@ public class CreateQuizQuestionsStage {
         Label numberOfQuestions2 = new Label(" Questions created");
 
         GridPane gridPane = new GridPane();
-        VBox vBox = new VBox(typeofQ, mcqButton, tfButton, wiButton, new HBox(quitButton, doneButton, numberOfQuestions, numberOfQuestions2));
-        gridPane.add(vBox, 0, 0);
+        VBox vBoxTypeQuestions = new VBox(typeofQ, mcqButton, tfButton, wiButton, new HBox(quitButton, doneButton, numberOfQuestions, numberOfQuestions2));
+        gridPane.add(vBoxTypeQuestions, 0, 0);
         gridPane.setVgap(20);
         gridPane.setHgap(20);
         gridPane.setStyle("-fx-padding: 50");

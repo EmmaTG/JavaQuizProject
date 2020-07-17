@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mcq.Data.QuestionDataSource;
 import mcq.Data.SelectQuizList;
@@ -141,6 +142,12 @@ public class Main extends Application {
                     createQuizQuestions.getCancel().setOnAction((e1) -> {
                         homeScreen("", stage);
                     });
+                    createQuizQuestions.setvBox(FXCollections.observableArrayList(createQuizQuestions.getNewQuestion(),
+                            createQuizQuestions.getEditButton(),
+                            createQuizQuestions.getDeleteButton(),
+                            createQuizQuestions.getPlayQuiz(),
+                            createQuizQuestions.getSaveQuiz(),
+                            createQuizQuestions.getCancel()));
                     Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(stage);
                     stage.setScene(createQuizQuestionsStage);
                     stage.setTitle(nameQuiz.getQuizTitle());
@@ -208,18 +215,41 @@ public class Main extends Application {
 
         Button editButton = SelectQuizList.getEditButton();
         editButton.setOnAction((e) -> {
+                    Stage newStage = new Stage();
                     String selectedQuizTitle = SelectQuizList.getSelectedItem();
                     QuestionDataSource.getInstance().queryQuizQuestion(selectedQuizTitle);
                     List<Question> listOfQuestions = QuestionDataSource.getInstance().getQuizQuestions();
                     Quiz selectedQuiz = new Quiz(selectedQuizTitle,listOfQuestions);
                     CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(selectedQuiz);
+                    VBox vBox = createQuizQuestions.getvBox();
                     Button doneButton = createQuizQuestions.getCancel();
-                    doneButton.setText("Done");
+                    doneButton.setText("Cancel");
                     doneButton.setOnAction((ev) -> {
-                        selectQuiz(stage);
+                        newStage.close();
+//                        selectQuiz(stage);
                     });
-                    Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(stage);
-                    stage.setScene(createQuizQuestionsStage);
+                    Button mainMenu = new Button("Main Menu");
+                    mainMenu.setOnAction((e2) -> {
+                        newStage.close();
+                        homeScreen("",stage);
+                    });
+                    mainMenu.setMaxWidth(Double.MAX_VALUE);
+                    Button saveButton = new Button("Save");
+                    saveButton.setMaxWidth(Double.MAX_VALUE);
+                    saveButton.setOnAction((e3) -> {
+                        new Thread(() -> QuestionDataSource.getInstance().saveNewQuiz(selectedQuiz)).start();
+                        newStage.close();
+//                        selectQuiz(stage);
+                    });
+                    createQuizQuestions.setvBox(FXCollections.observableArrayList(createQuizQuestions.getNewQuestion(),
+                            createQuizQuestions.getEditButton(),
+                            createQuizQuestions.getDeleteButton(),
+                            saveButton,
+                            doneButton,
+                            mainMenu));
+                    Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(newStage);
+                    newStage.setScene(createQuizQuestionsStage);
+                    newStage.showAndWait();
                 }
                 );
         stage.setScene(newScene);
@@ -246,7 +276,7 @@ public class Main extends Application {
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
 
-                Stage qsStage = new Stage();
+                Stage qsStage = window;
 
                 HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
                 count++;
@@ -255,9 +285,6 @@ public class Main extends Application {
                 ObservableList<Button> questionButtons = qs.getPossibleAnswers();
                 qs.setQuestionWindow(questionButtons, progressBar);
 
-                qsStage.setScene(qs.getQuestionScene());
-
-                qsStage.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
 
                 qsStage.setOnCloseRequest(we -> {
                     windowClose = true;
@@ -306,7 +333,6 @@ public class Main extends Application {
                                 correctAnswers++;
                                 qsStage.close();
                             } else {
-
                                 inCorrectAlert.setContentText("The answer is " + qs.getQuestion().getCorrectAnswer());
                                 inCorrectAlert.showAndWait();
                                 qsStage.close();
@@ -314,6 +340,8 @@ public class Main extends Application {
                         }
                     });
                 }
+                qsStage.setScene(qs.getQuestionScene());
+            qsStage.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
             qsStage.showAndWait();
             }
         }

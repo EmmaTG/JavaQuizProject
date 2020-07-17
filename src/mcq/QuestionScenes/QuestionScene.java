@@ -102,7 +102,6 @@ public class QuestionScene<T extends Question> {
 
     private HBox getImage(){
         try {
-            System.out.println(question.getQuestionImagePath());
             Image image = new Image(new FileInputStream(question.getQuestionImagePath()));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth( sceneWidth-100);
