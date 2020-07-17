@@ -40,7 +40,6 @@ public class Main extends Application {
     public static Stage window;
     public static boolean windowClose;
     public static boolean homeScreen;
-    public static Stage typeOfQStage = new Stage();
 
 
 
@@ -119,7 +118,6 @@ public class Main extends Application {
         stage.setScene(openingScene.getScene());
         stage.setTitle("Main Menu");
         stage.show();
-        ;
     }
 
     private static void createQuiz(Stage stage){
@@ -276,8 +274,6 @@ public class Main extends Application {
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
 
-                Stage qsStage = window;
-
                 HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
                 count++;
 
@@ -286,7 +282,7 @@ public class Main extends Application {
                 qs.setQuestionWindow(questionButtons, progressBar);
 
 
-                qsStage.setOnCloseRequest(we -> {
+                window.setOnCloseRequest(we -> {
                     windowClose = true;
                     homeScreen = true;
                 });
@@ -310,12 +306,12 @@ public class Main extends Application {
                                 if (b.getText().equalsIgnoreCase(qs.getQuestion().getCorrectAnswer())) {
                                     correctAlert.showAndWait();
                                     correctAnswers++;
-                                    qsStage.close();
+                                    window.close();
 
                                 } else {
                                     inCorrectAlert.setContentText("The answer is " + qs.getQuestion().getCorrectAnswer());
                                     inCorrectAlert.showAndWait();
-                                    qsStage.close();
+                                    window.close();
                                 }
                             }
                         });
@@ -331,18 +327,19 @@ public class Main extends Application {
                             if (answerField.getText().equalsIgnoreCase(qs.getQuestion().getCorrectAnswer())) {
                                 correctAlert.showAndWait();
                                 correctAnswers++;
-                                qsStage.close();
+                                window.close();
                             } else {
                                 inCorrectAlert.setContentText("The answer is " + qs.getQuestion().getCorrectAnswer());
                                 inCorrectAlert.showAndWait();
-                                qsStage.close();
+                                window.close();
                             }
                         }
                     });
                 }
-                qsStage.setScene(qs.getQuestionScene());
-            qsStage.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
-            qsStage.showAndWait();
+                window.setScene(qs.getQuestionScene());
+            window.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
+            window.showAndWait();
+            window.close();
             }
         }
 

@@ -11,7 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import mcq.Questions.MultipleChoiceQuestion;
 import mcq.Questions.Question;
 
@@ -29,7 +28,6 @@ public class QuestionScene<T extends Question> {
     protected static int questionNumber=0;
     public  final int sceneWidth = 400;
     public  final int sceneHeight = 500;
-    private Stage newStage;
     private Scene newScene;
 
 
@@ -116,9 +114,7 @@ public class QuestionScene<T extends Question> {
     }
 
     public Scene getQuestionScene() {
-//        newStage = new Stage();
         newScene = new Scene(questionWindow);
-//        newStage.setScene(newScene);
         newScene.getStylesheets().add(QuestionScene.class.getResource("QuestionScene.css").toExternalForm());
         return newScene;
     }

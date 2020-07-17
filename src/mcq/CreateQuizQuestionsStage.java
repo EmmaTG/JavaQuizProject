@@ -114,7 +114,7 @@ public class CreateQuizQuestionsStage {
         playQuiz.setOnAction(e -> {
             new Thread(saveRunnable).start();
             ObservableList<QuestionScene> questionScenes = Main.createQuestionScenes(createdQuiz.getQuestions());
-            newStage.close();
+//            newStage.close();
             Main.runQuiz(questionScenes);
 
         });
