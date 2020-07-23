@@ -1,5 +1,6 @@
 package mcq;
 
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -14,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mcq.Data.QuestionDataSource;
 import mcq.Data.SelectQuizList;
@@ -24,54 +24,56 @@ import mcq.Questions.MultipleChoiceQuestion;
 import mcq.Questions.Question;
 import mcq.Questions.TrueFalse;
 import mcq.Questions.WriteInQuestion;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 
 public class Main extends Application {
 //public class Main {
 
-    public static int correctAnswers;
-    public static int sceneWidth = 400;
-    public static int sceneHeight = 500;
-    public static Stage window;
-    public static boolean windowClose;
-    public static boolean homeScreen;
-
-
+    private static int correctAnswers;
+//    public static int sceneWidth = 400;
+//    public static int sceneHeight = 500;
+    private static Stage window;
+    private static boolean windowClose;
+    private static boolean homeScreen;
 
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-//        Quiz testQuiz = new Quiz("Test");
-//        List<Question> questionList = new ArrayList<>();
-//        MCQDialog dialogObject = new MCQDialog();
-//       Optional<MultipleChoiceQuestion> result = dialogObject.getDialog().showAndWait();
-//       if (result.isPresent()){
-//           MultipleChoiceQuestion mcq = result.get();
-//            questionList.add(mcq);
-//       }
-//       WriteInDialog dialogObject2 = new WriteInDialog();
-//        Optional<WriteInQuestion> result2 = dialogObject2.getDialog().showAndWait();
-//        if (result2.isPresent()){
-//            WriteInQuestion q = result2.get();
-//            questionList.add(q);
-//        }
-//
-//        TrueFalseDialog dialog3 = new TrueFalseDialog();
-//        Optional<TrueFalse> tfResult = dialog3.getDialog().showAndWait();
-//        if (tfResult.isPresent()){
-//            TrueFalse tf = tfResult.get();
-//            questionList.add(tf);
-//        }
-//
-//        runQuiz(FXCollections.observableArrayList(createQuestionScenes(questionList)));
+
+//        window = new Stage();
+//        Map<String,Long> categoryMap = getCategoriesList();
+//        if (categoryMap != null) {
+//            List<String> listOfCategories = new ArrayList<>();
+//            listOfCategories.addAll(categoryMap.keySet());
+//            listOfCategories.sort((s1, s2) -> s1.compareTo(s2));
+//            ListView<String> listView = new ListView<>(FXCollections.observableArrayList(listOfCategories));
+//            Button doneButton = new Button("Select");
+//            BorderPane bp = new BorderPane(listView);
+//            bp.setRight(new VBox(doneButton));
+//            doneButton.setOnAction((event) -> {
+//                String selected = listView.getSelectionModel().getSelectedItem();
+//                System.out.println("Category: " + selected);
+//                System.out.println("Id: " + categoryMap.get(selected));
+//                String apiRequest = createAPIRequest(10,categoryMap.get(selected).intValue());
+//                retrieveQuestions(apiRequest);
+//            });
+//            Scene scene = new Scene(bp);
+//            window.setScene(scene);
+//            window.show();
+//            String apiRequest = createAPIRequest(10,);
+//            retrieveQuestions(apiRequest);
 
         window = new Stage();
         homeScreen("Welcome!",window);
+//        }
 
     }
 
@@ -99,28 +101,22 @@ public class Main extends Application {
 
         //1. Create a new quiz
         Button createQuizButton = openingScene.getCreateQuiz();
-        createQuizButton.onActionProperty().setValue(event -> {
-            createQuiz(stage);
-        });
+        createQuizButton.onActionProperty().setValue(event -> createQuiz(stage));
 
         //2. Use an existing quiz from the database
         Button existingQuizButton = openingScene.getExistingQuiz();
-        existingQuizButton.onActionProperty().setValue(e -> {
-            selectQuiz(stage);
-        });
+        existingQuizButton.onActionProperty().setValue(e -> selectQuiz(stage));
 
         //3. Quit Application
         Button quitQuizButton = openingScene.getQuitQuiz();
-        quitQuizButton.onActionProperty().setValue(event -> {
-            stage.close();
-        });
+        quitQuizButton.onActionProperty().setValue(event -> stage.close());
 //            stage.setScene(op);
         stage.setScene(openingScene.getScene());
         stage.setTitle("Main Menu");
         stage.show();
     }
 
-    private static void createQuiz(Stage stage){
+    private static void createQuiz(Stage stage) {
 
         // Get scene for create quiz name
         CreateNewQuizStage nameQuiz = new CreateNewQuizStage();
@@ -137,9 +133,7 @@ public class Main extends Application {
                     nameQuiz.setQuizTitle(quizNameTextField.getText());
 
                     CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
-                    createQuizQuestions.getCancel().setOnAction((e1) -> {
-                        homeScreen("", stage);
-                    });
+                    createQuizQuestions.getCancel().setOnAction((e1) -> homeScreen("", stage));
                     createQuizQuestions.setvBox(FXCollections.observableArrayList(createQuizQuestions.getNewQuestion(),
                             createQuizQuestions.getEditButton(),
                             createQuizQuestions.getDeleteButton(),
@@ -159,16 +153,13 @@ public class Main extends Application {
         nameQuiz.getOkButton().setOnAction(continueEvent);
         quizNameTextField.setOnAction(continueEvent);
 
-        stage.setOnCloseRequest((e1) -> {
-            homeScreen("Welcome", stage);
-
-        });
+        stage.setOnCloseRequest((e1) -> homeScreen("Welcome", stage));
         stage.setScene(nameQuizStage);
         stage.setTitle("Name of New Quiz");
     }
 
 
-    public static ObservableList<QuestionScene> createQuestionScenes(List<Question> listOfQuestions) {
+    private static ObservableList<QuestionScene> createQuestionScenes(List<Question> listOfQuestions) {
 
         QuestionScene.resetQuestionNumbers();
 
@@ -187,9 +178,7 @@ public class Main extends Application {
                 questionScenes.add(writeInQuestionScene);
             }
         }
-
-        ObservableList<QuestionScene> questionScenesObservList = FXCollections.observableArrayList(questionScenes);
-        return questionScenesObservList;
+        return FXCollections.observableArrayList(questionScenes);
     }
 
     private static void selectQuiz(Stage stage) {
@@ -200,16 +189,25 @@ public class Main extends Application {
         Button startButton = SelectQuizList.getStartButton();
         startButton.setOnAction((e) -> {
             stage.close();
-            QuestionDataSource.getInstance().queryQuizQuestion(SelectQuizList.getSelectedItem());
-            List<Question> selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
-
-            if (selectedQuizQuestions != null){
-                ObservableList<QuestionScene> questionScenes = createQuestionScenes(selectedQuizQuestions);
-                runQuiz(questionScenes);
-            };
+            List<Question> selectedQuizQuestions = new ArrayList<>();
+            if (SelectQuizList.getSelectedCategory().equalsIgnoreCase("Other")){
+                String selected = SelectQuizList.getSelectedItem();
+                Map<String,Long> categoryMap = getCategoriesList();
+                if (categoryMap!=null) {
+//                    System.out.println("Id: " + categoryMap.get(SelectQuizList.getSelectedItem()));
+                    String apiRequest = createAPIRequest(10, categoryMap.get(selected).intValue());
+                    selectedQuizQuestions =retrieveQuestions(apiRequest);
+                }
+            } else {
+                QuestionDataSource.getInstance().queryQuizQuestion(SelectQuizList.getSelectedItem());
+                selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
+            }
+                if (selectedQuizQuestions != null) {
+                    runQuiz(selectedQuizQuestions);
+                }
         });
 
-        SelectQuizList.getHomeButton().setOnAction((e1) -> homeScreen("",stage));
+        SelectQuizList.getHomeButton().setOnAction((e1) -> homeScreen("", stage));
 
         Button editButton = SelectQuizList.getEditButton();
         editButton.setOnAction((e) -> {
@@ -217,9 +215,9 @@ public class Main extends Application {
                     String selectedQuizTitle = SelectQuizList.getSelectedItem();
                     QuestionDataSource.getInstance().queryQuizQuestion(selectedQuizTitle);
                     List<Question> listOfQuestions = QuestionDataSource.getInstance().getQuizQuestions();
-                    Quiz selectedQuiz = new Quiz(selectedQuizTitle,listOfQuestions);
+                    Quiz selectedQuiz = new Quiz(selectedQuizTitle, listOfQuestions);
                     CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(selectedQuiz);
-                    VBox vBox = createQuizQuestions.getvBox();
+//                    VBox vBox = createQuizQuestions.getvBox();
                     Button doneButton = createQuizQuestions.getCancel();
                     doneButton.setText("Cancel");
                     doneButton.setOnAction((ev) -> {
@@ -229,7 +227,7 @@ public class Main extends Application {
                     Button mainMenu = new Button("Main Menu");
                     mainMenu.setOnAction((e2) -> {
                         newStage.close();
-                        homeScreen("",stage);
+                        homeScreen("", stage);
                     });
                     mainMenu.setMaxWidth(Double.MAX_VALUE);
                     Button saveButton = new Button("Save");
@@ -249,25 +247,30 @@ public class Main extends Application {
                     newStage.setScene(createQuizQuestionsStage);
                     newStage.showAndWait();
                 }
-                );
+        );
         stage.setScene(newScene);
         stage.setTitle("Select Quiz");
 
     }
 
-    private static HBox setProgressBar(int counter, int listOfQuestionScenes){
+    private static HBox setProgressBar(int counter, int listOfQuestionScenes) {
         ProgressBar progressBar = new ProgressBar(((double) counter / (double) listOfQuestionScenes));
         progressBar.prefWidth(Double.MAX_VALUE);
         Label progressLabel = new Label();
         IntegerProperty intProperty = new SimpleIntegerProperty(counter);
         progressLabel.textProperty().bind(intProperty.asString());
         Label progressLabel2 = new Label("/" + listOfQuestionScenes);
-        HBox progressHBox = new HBox(progressBar,progressLabel,progressLabel2);
+        HBox progressHBox = new HBox(progressBar, progressLabel, progressLabel2);
         progressHBox.setAlignment(Pos.CENTER);
-        return  progressHBox;
+        return progressHBox;
     }
 
-    public static void runQuiz(ObservableList<QuestionScene> listOfQuestionScenes) {
+    public static void runQuiz(List<Question> listOfQuestions) {
+
+        window.close();
+
+        ObservableList<QuestionScene> listOfQuestionScenes = Main.createQuestionScenes(listOfQuestions);
+
         windowClose = false;
         correctAnswers = 0;
         int count = 0;
@@ -288,7 +291,7 @@ public class Main extends Application {
                 });
 
                 // Correct answer dialog
-                Alert correctAlert = createAlert("Correct!","Well done!","/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/correctImage.png");
+                Alert correctAlert = createAlert("Correct!", "Well done!", "/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/correctImage.png");
                 correctAlert.getDialogPane().getStyleClass().add("correctDialog");
 
                 // Incorrect answer dialog
@@ -321,9 +324,7 @@ public class Main extends Application {
 
                 if (qs.getQuestion() instanceof WriteInQuestion) {
                     TextField answerField = ((WriteInQuestionScene) qs).getAnswerField();
-                    answerField.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
+                    answerField.setOnAction(event -> {
                             if (answerField.getText().equalsIgnoreCase(qs.getQuestion().getCorrectAnswer())) {
                                 correctAlert.showAndWait();
                                 correctAnswers++;
@@ -333,33 +334,32 @@ public class Main extends Application {
                                 inCorrectAlert.showAndWait();
                                 window.close();
                             }
-                        }
-                    });
+                        });
                 }
                 window.setScene(qs.getQuestionScene());
-            window.setTitle("Question " + count + "of " +listOfQuestionScenes.size());
-            window.showAndWait();
-            window.close();
+                window.setTitle("Question " + count + "of " + listOfQuestionScenes.size());
+                window.showAndWait();
+                window.close();
             }
         }
 
         if (!windowClose) {
-            String s =String.format("Your Score: %d / %d \n \t %d %%", correctAnswers, listOfQuestionScenes.size(),
+            String s = String.format("Your Score: %d / %d \n \t %d %%", correctAnswers, listOfQuestionScenes.size(),
                     Math.round(((double) correctAnswers / listOfQuestionScenes.size()) * 100.00));
             resultsSummary(s);
 
-        } else if (windowClose && homeScreen) {
-            homeScreen("",window);
+        } else if (homeScreen) {
+            homeScreen("", window);
         }
 
 
     }
 
-    private static Alert createAlert(String headerText, String titleText, String imagePath){
+    private static Alert createAlert(String headerText, String titleText, String imagePath) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(headerText);
         alert.setTitle(titleText);
-        try{
+        try {
             ImageView imageView = getImageNode(imagePath);
             imageView.setFitHeight(50);
             imageView.setFitWidth(50);
@@ -373,7 +373,7 @@ public class Main extends Application {
         return alert;
     }
 
-    private static void resultsSummary(String contentText){
+    private static void resultsSummary(String contentText) {
         Alert finalAlert = new Alert(Alert.AlertType.CONFIRMATION);
         finalAlert.setTitle("Results");
         finalAlert.setHeaderText("Quiz Complete!");
@@ -390,7 +390,7 @@ public class Main extends Application {
         if (result.isPresent()) {
             if (result.get().getText().equalsIgnoreCase(mainMenu)) {
                 finalAlert.close();
-                homeScreen("",window);
+                homeScreen("", window);
             } else {
                 Platform.exit();
             }
@@ -401,10 +401,133 @@ public class Main extends Application {
         launch(args);
     }
 
-    private static ImageView getImageNode(String filePath) throws FileNotFoundException{
+    private static ImageView getImageNode(String filePath) throws FileNotFoundException {
         Image image = new Image(new FileInputStream(filePath));
         // Setting new image
         return new ImageView(image);
 
+    }
+
+    public static Map<String,Long> getCategoriesList(){
+        String categories = apiRequest("https://opentdb.com/api_category.php");
+        JSONObject jObj = getJsonArrayResults(categories);
+        if (jObj != null) {
+            JSONArray categoryArray = (JSONArray) jObj.get("trivia_categories");
+            Map<String, Long> categoryMap = new HashMap<>();
+            for (int i = 0; i < categoryArray.size(); i++) {
+                jObj = (JSONObject) categoryArray.get(i);
+                categoryMap.put((String) jObj.get("name"), (Long) jObj.get("id"));
+            }
+            return categoryMap;
+        }
+        return null;
+    }
+
+    private static String getToken() {
+        String result = apiRequest("https://opentdb.com/api_token.php?command=request");
+        JSONObject jsonObj = getJsonArrayResults(result);
+        if (jsonObj != null) {
+            Long responseCode = (Long) jsonObj.get("response_code");
+            if (responseCode != 0) {
+                System.out.println("Error getting questions.");
+                System.out.println("Response code received: " + responseCode);
+            } else {
+                return (String) jsonObj.get("token");
+            }
+        }
+        System.out.println("Array empty");
+        return "Error";
+    }
+
+    public static List<Question> retrieveQuestions(String apiURL) {
+        String userToken = getToken();
+        String result = apiRequest(apiURL + "&token=" + userToken);
+        JSONObject jObj = getJsonArrayResults(result);
+        if (jObj != null || (Long) jObj.get("response_code") == 0) {
+                JSONArray resultsArray = (JSONArray) jObj.get("results");
+                if (resultsArray != null) {
+                    JSONObject jsonObject = (JSONObject) resultsArray.get(0);
+//                System.out.println(jsonObject.keySet());
+                    jsonToQuestion(jsonObject);
+                    List<Question> listOfQuestions = new ArrayList<>();
+                    resultsArray.forEach(el -> listOfQuestions.add(jsonToQuestion((JSONObject) el)));
+                    return listOfQuestions;
+//                    System.out.println(listOfQuestions.size());
+//                    runQuiz(listOfQuestions);
+                }
+        } else {
+            Long responseCode = (Long) jObj.get("response_code");
+            if (responseCode == 4) {
+                System.out.println("All questions within this category have been answered");
+                System.out.println("Resetting token");
+                apiRequest("https://opentdb.com/api_token.php?command=reset&token=" + userToken);
+                retrieveQuestions(apiURL);
+            } else {
+                System.out.println("Error getting questions.");
+                System.out.println("Response code received: " + responseCode);
+            }
+        }
+        return null;
+    }
+
+    private static String apiRequest(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int code = connection.getResponseCode();
+            if (code != 200) {
+                throw new RuntimeException("Http Response code: " + code);
+            } else {
+                InputStream input = connection.getInputStream();
+                BufferedReader ioReader = new BufferedReader(new InputStreamReader(input));
+                return ioReader.readLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error in apiRequest: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private static Question jsonToQuestion(JSONObject jObj) {
+        if (jObj.get("type").equals("multiple")) {
+            String question = jObj.get("question").toString();
+            String correctAnswer = jObj.get("correct_answer").toString();
+            String incorrectAnswersOriginal = jObj.get("incorrect_answers").toString();
+            String incorrectAnswers = incorrectAnswersOriginal.replaceAll("[\\[\\]\"]", "");
+            String[] incorrectAnswerList = incorrectAnswers.split(",");
+            List<String> incorrectList = new ArrayList<>();
+            incorrectList.add(correctAnswer);
+            Collections.addAll(incorrectList, incorrectAnswerList);
+            return new MultipleChoiceQuestion(question, correctAnswer, incorrectList);
+        } else if (jObj.get("type").equals("boolean")) {
+            String question = jObj.get("question").toString();
+            String correctAnswer = jObj.get("correct_answer").toString();
+            return new TrueFalse(question, correctAnswer);
+        }
+        return null;
+    }
+
+    private static JSONObject getJsonArrayResults(String readString) {
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject jsonObject = (JSONObject) parser.parse(readString);
+            return jsonObject;
+        } catch (ParseException jsonE) {
+            System.out.println("Json-simple error: " + jsonE.getMessage());
+            return null;
+        }
+    }
+
+    private static String createAPIRequest(int noOfQuestions, int categoryID, String difficulty) {
+        return String.format("https://opentdb.com/api.php?amount=%d&category=%d&difficulty=%s", noOfQuestions, categoryID, difficulty);
+    }
+
+    public static String createAPIRequest(int noOfQuestions, int categoryID) {
+        return String.format("https://opentdb.com/api.php?amount=%d&category=%d", noOfQuestions, categoryID);
+    }
+
+    private static String createAPIRequest(int noOfQuestions) {
+        return String.format("https://opentdb.com/api.php?amount=%d", noOfQuestions);
     }
 }

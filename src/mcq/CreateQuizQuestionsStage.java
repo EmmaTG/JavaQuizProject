@@ -17,7 +17,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mcq.Data.QuestionDataSource;
-import mcq.QuestionScenes.QuestionScene;
 import mcq.Questions.Question;
 
 import java.util.List;
@@ -113,9 +112,8 @@ public class CreateQuizQuestionsStage {
         playQuiz.setMaxWidth(Double.MAX_VALUE);
         playQuiz.setOnAction(e -> {
             new Thread(saveRunnable).start();
-            ObservableList<QuestionScene> questionScenes = Main.createQuestionScenes(createdQuiz.getQuestions());
 //            newStage.close();
-            Main.runQuiz(questionScenes);
+            Main.runQuiz(createdQuiz.getQuestions());
 
         });
 
