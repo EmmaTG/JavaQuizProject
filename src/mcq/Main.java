@@ -49,7 +49,6 @@ public class Main extends Application {
 
         window = new Stage();
         homeScreen("Welcome!",window);
-//        }
 
     }
 
