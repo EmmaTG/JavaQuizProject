@@ -6,6 +6,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mcq.Questions.Question;
 
+import java.util.List;
+
 public class WriteInQuestionScene extends QuestionScene {
     private TextField answerField;
 
@@ -15,7 +17,7 @@ public class WriteInQuestionScene extends QuestionScene {
     }
 
     @Override
-    public void setQuestionWindow(HBox progressHBox) {
+    public void setQuestionWindow(List buttonActions, HBox progressHBox) {
         answerField.prefWidth(sceneWidth);
 
         VBox optionsVBox = questionHeading(question,questionNumber);

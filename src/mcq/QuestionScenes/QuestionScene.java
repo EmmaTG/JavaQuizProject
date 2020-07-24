@@ -39,8 +39,7 @@ public class QuestionScene<T extends Question> {
 
     public QuestionScene(T question) {
         this.question = question;
-        setPossibleAnswers();
-        this.possibleAnswers = getPossibleAnswers();
+        this.possibleAnswers = new ArrayList<>();
         this.time = 30.00;
     }
 
@@ -55,17 +54,17 @@ public class QuestionScene<T extends Question> {
         return questionWindow;
     }
 
-    public void setQuestionWindow(HBox progressHBox){
+    public void setQuestionWindow(List<Button> buttonActions, HBox progressHBox){
         List<HBox> hboxes = new ArrayList<>();
-        for (int i=0;i<possibleAnswers.size();i+=2){
+        for (int i=0;i<buttonActions.size();i+=2){
             HBox answerOptions = new HBox();
-            possibleAnswers.get(i).getStyleClass().add("answerButton"+i);
-            possibleAnswers.get(i+1).getStyleClass().add("answerButton"+(i+1));
+            buttonActions.get(i).getStyleClass().add("answerButton"+i);
+            buttonActions.get(i+1).getStyleClass().add("answerButton"+(i+1));
             try {
-                answerOptions = new HBox(possibleAnswers.get(i),possibleAnswers.get(i+1));
+                answerOptions = new HBox(buttonActions.get(i),buttonActions.get(i+1));
             } catch (IndexOutOfBoundsException e){
                 System.out.println(e.getMessage());
-                answerOptions = new HBox(possibleAnswers.get(i));
+                answerOptions = new HBox(buttonActions.get(i));
             } finally {
                 answerOptions.setSpacing(10);
                 hboxes.add(answerOptions);
@@ -129,7 +128,6 @@ public class QuestionScene<T extends Question> {
     }
 
     public void setPossibleAnswers() {
-        possibleAnswers = new ArrayList<>();
         questionNumber++;
         if (this.question instanceof MultipleChoiceQuestion) {
             for (String buttonText : question.getOptions()) {

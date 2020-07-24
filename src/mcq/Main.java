@@ -173,6 +173,7 @@ public class Main extends Application {
         }
         if (selectedQuizQuestions != null) {
             runQuiz(selectedQuizQuestions);
+
         }
     }
 
@@ -250,11 +251,18 @@ public class Main extends Application {
         int count = 0;
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
+
+                HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
+                count++;
+
+                qs.setPossibleAnswers();
+                ObservableList<Button> questionButtons = qs.getPossibleAnswers();
+                qs.setQuestionWindow(questionButtons, progressBar);
+
+
                 window.setOnCloseRequest(we -> {
-                    homeScreen("", window);
-                    return;
-//                    windowClose = true;
-//                    homeScreen = true;
+                    windowClose = true;
+                    homeScreen = true;
                 });
 
                 // Correct answer dialog
@@ -265,7 +273,6 @@ public class Main extends Application {
                 Alert inCorrectAlert = createAlert("Incorrect!", "Whoops!", "/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/incorrectImage.png");
                 inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
 
-                ObservableList<Button> questionButtons = qs.getPossibleAnswers();
                 FXCollections.shuffle(questionButtons);
 
 
@@ -304,13 +311,8 @@ public class Main extends Application {
                             }
                         });
                 }
-
-                HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
-                count++;
-                qs.setQuestionWindow(progressBar);
-
                 window.setScene(qs.getQuestionScene());
-                window.setTitle("Question " + count + " of " + listOfQuestionScenes.size());
+                window.setTitle("Question " + count + "of " + listOfQuestionScenes.size());
                 window.showAndWait();
                 window.close();
             }
