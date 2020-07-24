@@ -17,7 +17,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import mcq.Data.QuestionDataSource;
-import mcq.Data.SelectQuizList;
 import mcq.QuestionScenes.QuestionScene;
 import mcq.QuestionScenes.WriteInQuestionScene;
 import mcq.Questions.MultipleChoiceQuestion;
@@ -38,8 +37,6 @@ public class Main extends Application {
 //public class Main {
 
     private static int correctAnswers;
-//    public static int sceneWidth = 400;
-//    public static int sceneHeight = 500;
     private static Stage window;
     private static boolean windowClose;
     private static boolean homeScreen;
@@ -47,29 +44,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 
-//        window = new Stage();
-//        Map<String,Long> categoryMap = getCategoriesList();
-//        if (categoryMap != null) {
-//            List<String> listOfCategories = new ArrayList<>();
-//            listOfCategories.addAll(categoryMap.keySet());
-//            listOfCategories.sort((s1, s2) -> s1.compareTo(s2));
-//            ListView<String> listView = new ListView<>(FXCollections.observableArrayList(listOfCategories));
-//            Button doneButton = new Button("Select");
-//            BorderPane bp = new BorderPane(listView);
-//            bp.setRight(new VBox(doneButton));
-//            doneButton.setOnAction((event) -> {
-//                String selected = listView.getSelectionModel().getSelectedItem();
-//                System.out.println("Category: " + selected);
-//                System.out.println("Id: " + categoryMap.get(selected));
-//                String apiRequest = createAPIRequest(10,categoryMap.get(selected).intValue());
-//                retrieveQuestions(apiRequest);
-//            });
-//            Scene scene = new Scene(bp);
-//            window.setScene(scene);
-//            window.show();
-//            String apiRequest = createAPIRequest(10,);
-//            retrieveQuestions(apiRequest);
 
         window = new Stage();
         homeScreen("Welcome!",window);
@@ -181,73 +157,71 @@ public class Main extends Application {
         return FXCollections.observableArrayList(questionScenes);
     }
 
+    private static void startSelectedQuiz(Stage stage) {
+        stage.close();
+        List<Question> selectedQuizQuestions = new ArrayList<>();
+        if (SelectQuizList.getSelectedCategory().equalsIgnoreCase("Other")) {
+            String selected = SelectQuizList.getSelectedItem();
+            Map<String, Long> categoryMap = getCategoriesList();
+            if (categoryMap != null) {
+                String apiRequest = createAPIRequest(10, categoryMap.get(selected).intValue());
+                selectedQuizQuestions = retrieveQuestions(apiRequest);
+            }
+        } else {
+            QuestionDataSource.getInstance().queryQuizQuestion(SelectQuizList.getSelectedItem());
+            selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
+        }
+        if (selectedQuizQuestions != null) {
+            runQuiz(selectedQuizQuestions);
+        }
+    }
+
+    private static void editSelectedQuiz(Stage stage){
+        Stage newStage = new Stage();
+        String selectedQuizTitle = SelectQuizList.getSelectedItem();
+        QuestionDataSource.getInstance().queryQuizQuestion(selectedQuizTitle);
+        List<Question> listOfQuestions = QuestionDataSource.getInstance().getQuizQuestions();
+        Quiz selectedQuiz = new Quiz(selectedQuizTitle, listOfQuestions);
+        CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(selectedQuiz);
+        Button doneButton = createQuizQuestions.getCancel();
+        doneButton.setText("Cancel");
+        doneButton.setOnAction((ev) -> newStage.close());
+        Button mainMenu = new Button("Main Menu");
+        mainMenu.setOnAction((e2) -> {
+            newStage.close();
+            homeScreen("", stage);
+        });
+        mainMenu.setMaxWidth(Double.MAX_VALUE);
+        Button saveButton = new Button("Save");
+        saveButton.setMaxWidth(Double.MAX_VALUE);
+        saveButton.setOnAction((e3) -> {
+            new Thread(() -> QuestionDataSource.getInstance().saveNewQuiz(selectedQuiz)).start();
+            newStage.close();
+        });
+        createQuizQuestions.setvBox(FXCollections.observableArrayList(createQuizQuestions.getNewQuestion(),
+                createQuizQuestions.getEditButton(),
+                createQuizQuestions.getDeleteButton(),
+                saveButton,
+                doneButton,
+                mainMenu));
+        Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(newStage);
+        newStage.setScene(createQuizQuestionsStage);
+        newStage.showAndWait();
+    }
+
+
     private static void selectQuiz(Stage stage) {
         Scene newScene;
 
         newScene = SelectQuizList.createScene();
 
         Button startButton = SelectQuizList.getStartButton();
-        startButton.setOnAction((e) -> {
-            stage.close();
-            List<Question> selectedQuizQuestions = new ArrayList<>();
-            if (SelectQuizList.getSelectedCategory().equalsIgnoreCase("Other")){
-                String selected = SelectQuizList.getSelectedItem();
-                Map<String,Long> categoryMap = getCategoriesList();
-                if (categoryMap!=null) {
-//                    System.out.println("Id: " + categoryMap.get(SelectQuizList.getSelectedItem()));
-                    String apiRequest = createAPIRequest(10, categoryMap.get(selected).intValue());
-                    selectedQuizQuestions =retrieveQuestions(apiRequest);
-                }
-            } else {
-                QuestionDataSource.getInstance().queryQuizQuestion(SelectQuizList.getSelectedItem());
-                selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
-            }
-                if (selectedQuizQuestions != null) {
-                    runQuiz(selectedQuizQuestions);
-                }
-        });
+        startButton.setOnAction((e) -> startSelectedQuiz(stage));
 
         SelectQuizList.getHomeButton().setOnAction((e1) -> homeScreen("", stage));
 
         Button editButton = SelectQuizList.getEditButton();
-        editButton.setOnAction((e) -> {
-                    Stage newStage = new Stage();
-                    String selectedQuizTitle = SelectQuizList.getSelectedItem();
-                    QuestionDataSource.getInstance().queryQuizQuestion(selectedQuizTitle);
-                    List<Question> listOfQuestions = QuestionDataSource.getInstance().getQuizQuestions();
-                    Quiz selectedQuiz = new Quiz(selectedQuizTitle, listOfQuestions);
-                    CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(selectedQuiz);
-//                    VBox vBox = createQuizQuestions.getvBox();
-                    Button doneButton = createQuizQuestions.getCancel();
-                    doneButton.setText("Cancel");
-                    doneButton.setOnAction((ev) -> {
-                        newStage.close();
-//                        selectQuiz(stage);
-                    });
-                    Button mainMenu = new Button("Main Menu");
-                    mainMenu.setOnAction((e2) -> {
-                        newStage.close();
-                        homeScreen("", stage);
-                    });
-                    mainMenu.setMaxWidth(Double.MAX_VALUE);
-                    Button saveButton = new Button("Save");
-                    saveButton.setMaxWidth(Double.MAX_VALUE);
-                    saveButton.setOnAction((e3) -> {
-                        new Thread(() -> QuestionDataSource.getInstance().saveNewQuiz(selectedQuiz)).start();
-                        newStage.close();
-//                        selectQuiz(stage);
-                    });
-                    createQuizQuestions.setvBox(FXCollections.observableArrayList(createQuizQuestions.getNewQuestion(),
-                            createQuizQuestions.getEditButton(),
-                            createQuizQuestions.getDeleteButton(),
-                            saveButton,
-                            doneButton,
-                            mainMenu));
-                    Scene createQuizQuestionsStage = createQuizQuestions.getNewScene(newStage);
-                    newStage.setScene(createQuizQuestionsStage);
-                    newStage.showAndWait();
-                }
-        );
+        editButton.setOnAction((e) -> editSelectedQuiz(stage));
         stage.setScene(newScene);
         stage.setTitle("Select Quiz");
 
@@ -276,18 +250,11 @@ public class Main extends Application {
         int count = 0;
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
-
-                HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
-                count++;
-
-                qs.setPossibleAnswers();
-                ObservableList<Button> questionButtons = qs.getPossibleAnswers();
-                qs.setQuestionWindow(questionButtons, progressBar);
-
-
                 window.setOnCloseRequest(we -> {
-                    windowClose = true;
-                    homeScreen = true;
+                    homeScreen("", window);
+                    return;
+//                    windowClose = true;
+//                    homeScreen = true;
                 });
 
                 // Correct answer dialog
@@ -298,6 +265,7 @@ public class Main extends Application {
                 Alert inCorrectAlert = createAlert("Incorrect!", "Whoops!", "/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/incorrectImage.png");
                 inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
 
+                ObservableList<Button> questionButtons = qs.getPossibleAnswers();
                 FXCollections.shuffle(questionButtons);
 
 
@@ -336,8 +304,13 @@ public class Main extends Application {
                             }
                         });
                 }
+
+                HBox progressBar = setProgressBar(count, listOfQuestionScenes.size());
+                count++;
+                qs.setQuestionWindow(progressBar);
+
                 window.setScene(qs.getQuestionScene());
-                window.setTitle("Question " + count + "of " + listOfQuestionScenes.size());
+                window.setTitle("Question " + count + " of " + listOfQuestionScenes.size());
                 window.showAndWait();
                 window.close();
             }
