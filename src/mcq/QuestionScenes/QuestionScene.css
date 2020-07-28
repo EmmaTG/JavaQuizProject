@@ -1,0 +1,40 @@
+.answerButton0 {
+    -fx-background-color: blue;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: black;
+    -fx-font-size: 16px;
+    }
+.answerButton1 {
+    -fx-background-color: red;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: black;
+    -fx-font-size: 16px;
+    }
+.answerButton2 {
+    -fx-background-color: lime;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: black;
+    -fx-font-size: 16px;
+   }
+.answerButton3 {
+    -fx-background-color: darkorange;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: black;
+    -fx-font-size: 16px;
+      }
+
+.questionNumber {
+    -fx-text-fill: black;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.questionLabel {
+    -fx-text-fill: black;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}

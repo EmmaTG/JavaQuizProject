@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JavaQuizProject:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JavaQuizProject_jar</output-path>
+    <root id="archive" name="JavaQuizProject.jar">
+      <element id="module-output" name="JavaQuizProject" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/json-simple-1.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/sqlite-jdbc-3.21.0.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

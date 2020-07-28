@@ -1,0 +1,37 @@
+.myGrid {
+    -fx-background-color: white;
+}
+
+.createQuizButton {
+    -fx-background-color: blue;
+    -fx-text-fill: black;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+}
+
+.existingQuizButton {
+    -fx-background-color: lime;
+    -fx-text-fill: black;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+}
+
+.quitQuizButton{
+    -fx-background-color: red;
+    -fx-text-fill: black;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+}
+
+.welcomeLabel {
+    -fx-text-fill: black;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-font-weight:bold;
+    -fx-font-size: 26px;
+}
+
+.userPrompt {
+    -fx-text-fill: black;
+    -fx-text-alignment: center;
+    }

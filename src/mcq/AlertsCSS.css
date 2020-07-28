@@ -1,0 +1,36 @@
+.correctDialog{
+    -fx-background-color: white;
+}
+
+.correctDialog:header *.header-panel *.label{
+                  -fx-font-size: 30px;
+                  -fx-padding: 18;
+                  }
+.correctDialog > *.button-bar > *.container{
+-fx-color: green;
+-fx-font-weight:bold;
+}
+.correctDialog .button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: green;
+}
+
+
+
+.incorrectDialog{
+    -fx-background-color: white;
+}
+
+.incorrectDialog:header *.header-panel *.label{
+                  -fx-font-size: 30px;
+                  -fx-padding: 18;
+                  }
+.incorrectDialog > *.button-bar > *.container{
+-fx-color: darkred;
+-fx-font-weight:bold;
+}
+
+.incorrectDialog .button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: darkred;
+}
