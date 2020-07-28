@@ -86,7 +86,6 @@ public class QuestionDataSource {
 
     public boolean open(){
         try{
-            System.out.println(CONNECTION_STRING);
             conn = DriverManager.getConnection(CONNECTION_STRING);
             queryQuizPrep = conn.prepareStatement(queryQuizSQL);
             saveQuizPrep = conn.prepareStatement(addQuiz);
