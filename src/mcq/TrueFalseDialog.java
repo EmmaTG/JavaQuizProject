@@ -9,6 +9,11 @@ import mcq.Questions.TrueFalse;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 
 public class TrueFalseDialog{
 
@@ -104,7 +109,12 @@ public class TrueFalseDialog{
         if (imageCheck.isSelected() && !filePath.getText().trim().isEmpty()) {
             try {
                 String filePathString = filePath.getText();
-                Image image = new Image(new FileInputStream(filePathString));
+                List<String> splitString = Arrays.asList(filePathString.split("/"));
+                String fileName = splitString.get(splitString.size()-1);
+                String newImagePath = "./src/mcq/Images/" + fileName;
+                Files.copy(Paths.get(filePathString),Paths.get(newImagePath), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(Paths.get(filePathString), Paths.get("./out/production/JavaQuizProject/mcq/Images/" + fileName), StandardCopyOption.REPLACE_EXISTING);
+                Image image = new Image(new FileInputStream(newImagePath));
                 filePath.clear();
                 return new TrueFalse(questionTextField.getText(), correctAnswer, filePathString, image);
             } catch (IOException e) {

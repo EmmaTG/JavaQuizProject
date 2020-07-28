@@ -85,7 +85,6 @@ public class Main extends Application {
         //3. Quit Application
         Button quitQuizButton = openingScene.getQuitQuiz();
         quitQuizButton.onActionProperty().setValue(event -> stage.close());
-//            stage.setScene(op);
         stage.setScene(openingScene.getScene());
         stage.setTitle("Main Menu");
         stage.show();
@@ -93,7 +92,7 @@ public class Main extends Application {
 
     private static void createQuiz(Stage stage) {
 
-        // Get scene for create quiz name
+        // Start scene to input the new quizzes name
         CreateNewQuizStage nameQuiz = new CreateNewQuizStage();
         Scene nameQuizStage = nameQuiz.getNewScene();
         nameQuiz.getBackButton().setOnAction((e2) -> homeScreen("", stage));
@@ -102,11 +101,12 @@ public class Main extends Application {
             String quizTitle = quizNameTextField.getText();
             if (!quizNameTextField.getText().isEmpty() && !quizNameTextField.getText().trim().isEmpty()) {
                 if (QuestionDataSource.getInstance().quizNameExists(quizTitle)) {
+                    // Check if quiz name already exists in the database
                     Alert alert = new Alert(Alert.AlertType.ERROR, "This quiz name already exists. \nPlease try another name");
                     alert.show();
                 } else {
                     nameQuiz.setQuizTitle(quizNameTextField.getText());
-
+                    // Interface to create new quiz
                     CreateQuizQuestionsStage createQuizQuestions = new CreateQuizQuestionsStage(nameQuiz.getQuizTitle());
                     createQuizQuestions.getCancel().setOnAction((e1) -> homeScreen("", stage));
                     createQuizQuestions.setvBox(FXCollections.observableArrayList(createQuizQuestions.getNewQuestion(),
@@ -135,7 +135,7 @@ public class Main extends Application {
 
 
     private static ObservableList<QuestionScene> createQuestionScenes(List<Question> listOfQuestions) {
-
+        // Creates Scene for each question within a quiz
         QuestionScene.resetQuestionNumbers();
 
         ObservableList<Question> observableListOfQuestions = FXCollections.observableArrayList(listOfQuestions);
@@ -157,9 +157,11 @@ public class Main extends Application {
     }
 
     private static void startSelectedQuiz(Stage stage) {
+        // Starts quiz selected from existing quiz list
         stage.close();
         List<Question> selectedQuizQuestions = new ArrayList<>();
         if (SelectQuizList.getSelectedCategory().equalsIgnoreCase("Other")) {
+            // Begins API request to get available categories on online database
             String selected = SelectQuizList.getSelectedItem();
             Map<String, Long> categoryMap = getCategoriesList();
             if (categoryMap != null) {
@@ -167,6 +169,7 @@ public class Main extends Application {
                 selectedQuizQuestions = retrieveQuestions(apiRequest);
             }
         } else {
+            // Collects quizzes stored in database
             QuestionDataSource.getInstance().queryQuizQuestion(SelectQuizList.getSelectedItem());
             selectedQuizQuestions = QuestionDataSource.getInstance().getQuizQuestions();
         }
@@ -177,6 +180,7 @@ public class Main extends Application {
     }
 
     private static void editSelectedQuiz(Stage stage){
+        // Edit a question already created
         Stage newStage = new Stage();
         String selectedQuizTitle = SelectQuizList.getSelectedItem();
         QuestionDataSource.getInstance().queryQuizQuestion(selectedQuizTitle);
@@ -228,6 +232,7 @@ public class Main extends Application {
     }
 
     private static HBox setProgressBar(int counter, int listOfQuestionScenes) {
+        // Creates progress bar when runnning a quiz
         ProgressBar progressBar = new ProgressBar(((double) counter / (double) listOfQuestionScenes));
         progressBar.prefWidth(Double.MAX_VALUE);
         Label progressLabel = new Label();
@@ -248,6 +253,18 @@ public class Main extends Application {
         windowClose = false;
         correctAnswers = 0;
         int count = 0;
+
+
+        // Correct answer dialog
+        String imagePath = Main.class.getResource("./Images/correctImage.png").getPath();
+        Alert correctAlert = createAlert("Correct!", "Well done!", imagePath);
+        correctAlert.getDialogPane().getStyleClass().add("correctDialog");
+
+        // Incorrect answer dialog
+        imagePath = Main.class.getResource("./Images/incorrectImage.png").getPath();
+        Alert inCorrectAlert = createAlert("Incorrect!", "Whoops!", imagePath);
+        inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
+
         for (QuestionScene qs : listOfQuestionScenes) {
             if (!windowClose) {
 
@@ -263,14 +280,6 @@ public class Main extends Application {
                     windowClose = true;
                     homeScreen = true;
                 });
-
-                // Correct answer dialog
-                Alert correctAlert = createAlert("Correct!", "Well done!", "/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/correctImage.png");
-                correctAlert.getDialogPane().getStyleClass().add("correctDialog");
-
-                // Incorrect answer dialog
-                Alert inCorrectAlert = createAlert("Incorrect!", "Whoops!", "/home/etg/Desktop/GIT/JavaQuizProject/src/mcq/incorrectImage.png");
-                inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
 
                 FXCollections.shuffle(questionButtons);
 
