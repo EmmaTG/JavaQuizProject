@@ -256,12 +256,12 @@ public class Main extends Application {
 
 
         // Correct answer dialog
-        String imagePath = Main.class.getResource("./Images/correctImage.png").getPath();
+        String imagePath = System.getProperty("user.dir")+ "/Images/correctImage.png";
         Alert correctAlert = createAlert("Correct!", "Well done!", imagePath);
         correctAlert.getDialogPane().getStyleClass().add("correctDialog");
 
         // Incorrect answer dialog
-        imagePath = Main.class.getResource("./Images/incorrectImage.png").getPath();
+        imagePath = System.getProperty("user.dir")+ "/Images/incorrectImage.png";
         Alert inCorrectAlert = createAlert("Incorrect!", "Whoops!", imagePath);
         inCorrectAlert.getDialogPane().getStyleClass().add("incorrectDialog");
 
